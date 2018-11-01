@@ -1,1 +1,3 @@
 # oatpp-curl
+# IN DEVELOPMENT PROCESS.  
+# NOT READY YET.
