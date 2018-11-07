@@ -27,11 +27,25 @@
 namespace oatpp { namespace curl {
   
 size_t CurlHeadersReader::headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-  //CurlHeadersReader* instance = static_cast<CurlHeadersReader*>(userdata);
-  v_int32 strSize = (v_int32)(size * nmemb);
-  oatpp::String header(ptr, strSize, true);
-  OATPP_LOGD("curl", "headers::callback(). header='%s'", header->c_str());
-  return header->getSize();
+  
+  oatpp::parser::ParsingCaret caret((p_char8)ptr, (v_int32)(size * nmemb));
+  
+  CurlHeadersReader* instance = static_cast<CurlHeadersReader*>(userdata);
+  
+  if(instance->m_state == STATE_INITIALIZED) {
+    instance->m_state = STATE_STARTED;
+    instance->m_startingLine = oatpp::web::protocol::http::Protocol::parseResponseStartingLine(caret);
+  } else if(instance->m_state == STATE_STARTED) {
+    if(caret.isAtRN()) {
+      instance->m_state = STATE_FINISHED;
+    }
+    oatpp::web::protocol::http::Status error;
+    oatpp::web::protocol::http::Protocol::parseOneHeader(*instance->m_headers, caret, error);
+  } else if(instance->m_state == STATE_FINISHED) {
+    throw std::runtime_error("[oatpp::curl::CurlHeadersReader::headerCallback(...)]: Invalid state.");
+  }
+  
+  return caret.getSize();
 }
   
 }}

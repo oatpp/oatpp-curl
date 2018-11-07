@@ -27,15 +27,23 @@
 
 #include "./Curl.hpp"
 
+#include "oatpp/web/protocol/http/Http.hpp"
 #include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 
 namespace oatpp { namespace curl {
   
 class CurlHeadersReader {
+public:
+  constexpr static v_int32 STATE_INITIALIZED = 0;
+  constexpr static v_int32 STATE_STARTED = 1;
+  constexpr static v_int32 STATE_FINISHED = 2;
 private:
   std::shared_ptr<CurlHandles> m_handles;
-  oatpp::data::stream::ChunkedBuffer m_buffer;
   os::io::Library::v_size m_position;
+  v_int32 m_state;
+  std::shared_ptr<oatpp::web::protocol::http::Protocol::Headers> m_headers;
+  std::shared_ptr<oatpp::web::protocol::http::ResponseStartingLine> m_startingLine;
+  oatpp::data::stream::ChunkedBuffer m_buffer;
 private:
   static size_t headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 public:
@@ -43,9 +51,23 @@ public:
   CurlHeadersReader(const std::shared_ptr<CurlHandles>& curlHandles)
     : m_handles(curlHandles)
     , m_position(0)
+    , m_state(STATE_INITIALIZED)
+    , m_headers(oatpp::web::protocol::http::Protocol::Headers::createShared())
   {
     curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERFUNCTION, headerCallback);
     curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERDATA, this);
+  }
+  
+  v_int32 getState() {
+    return m_state;
+  }
+  
+  std::shared_ptr<oatpp::web::protocol::http::ResponseStartingLine> getStartingLine() {
+    return m_startingLine;
+  }
+  
+  std::shared_ptr<oatpp::web::protocol::http::Protocol::Headers> getHeaders() {
+    return m_headers;
   }
   
 };

@@ -24,11 +24,13 @@
 
 #include "RequestExecutor.hpp"
 
+#include "BodyInputStream.hpp"
 #include "CurlHeadersReader.hpp"
 #include "CurlBodyReader.hpp"
 #include "CurlBodyWriter.hpp"
 
 #include <curl/curl.h>
+#include <chrono>
 
 namespace oatpp { namespace curl {
   
@@ -37,12 +39,11 @@ namespace oatpp { namespace curl {
                                                                       const std::shared_ptr<Headers>& userDefinedHeaders,
                                                                       const std::shared_ptr<Body>& body)
   {
-  
-    oatpp::String host = "http://httpbin.org/stream/4096";//"http://httpbin.org/put";
-    oatpp::String url = host;// + path;
+    
+    oatpp::String url = m_baseUrl + path;
     
     auto curl = std::make_shared<CurlHandles>();
-    CurlBodyReader reader(curl);
+    auto reader = std::make_shared<CurlBodyReader>(curl);
     CurlBodyWriter writer(curl);
     CurlHeadersReader headersReader(curl);
     CurlHeaders headers;
@@ -64,7 +65,7 @@ namespace oatpp { namespace curl {
     }
     
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_URL, url->c_str());
-    curl_easy_setopt(curl->getEasyHandle(), CURLOPT_CUSTOMREQUEST, "GET");//method->c_str());
+    curl_easy_setopt(curl->getEasyHandle(), CURLOPT_CUSTOMREQUEST, method->c_str());
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_HTTPHEADER, headers.getCurlList());
     
     if(bodyHeaders) {
@@ -72,18 +73,32 @@ namespace oatpp { namespace curl {
       writer.write("long long data goes here", 24);
     }
     
-    auto chunkedBuffer = oatpp::data::stream::ChunkedBuffer::createShared();
-    v_char8 buffer [256];
-    v_int64 count = 0;
-    while ((count = reader.read(buffer, 256)) > 0) {
-      chunkedBuffer->write(buffer, count);
-      OATPP_LOGD("curl", "iteration count=%d", count);
+    int still_running = 1;
+    curl_multi_perform(curl->getMultiHandle(), &still_running);
+    while (still_running && headersReader.getState() == CurlHeadersReader::STATE_INITIALIZED) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      curl_multi_perform(curl->getMultiHandle(), &still_running);
     }
     
-    OATPP_LOGD("result", "data='%s'", chunkedBuffer->toString()->c_str());
-  
+    if(!still_running) {
+      throw std::runtime_error("[oatpp::curl::RequestExecutor::execute()]: Unknown error.");
+    }
     
-    return nullptr;
+    while (still_running && headersReader.getState() != CurlHeadersReader::STATE_FINISHED) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      curl_multi_perform(curl->getMultiHandle(), &still_running);
+    }
+    
+    if(!still_running) {
+      throw std::runtime_error("[oatpp::curl::RequestExecutor::execute()]: Unknown error.");
+    }
+    
+    auto line = headersReader.getStartingLine();
+    auto responseHeaders = headersReader.getHeaders();
+    
+    auto bodyStream = std::make_shared<BodyInputStream>(reader, false);
+    
+    return Response::createShared(line->statusCode, line->description, responseHeaders, bodyStream);
   }
   
 }}
