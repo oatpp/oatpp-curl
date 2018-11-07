@@ -22,40 +22,16 @@
  *
  ***************************************************************************/
 
-#ifndef oatpp_curl_CurlWriter_hpp
-#define oatpp_curl_CurlWriter_hpp
-
-#include "./Curl.hpp"
-
-#include "oatpp/core/data/stream/Stream.hpp"
-
-#include <memory>
+#include "CurlHeadersReader.hpp"
 
 namespace oatpp { namespace curl {
   
-class CurlWriter {
-private:
-  std::shared_ptr<CurlHandles> m_handles;
-  const void* m_currentData;
-  os::io::Library::v_size m_currentDataSize;
-private:
-  static size_t readCallback(char *buffer, size_t size, size_t nitems, void *userdata);
-public:
-  
-  CurlWriter(const std::shared_ptr<CurlHandles>& curlHandles)
-    : m_handles(curlHandles)
-    , m_currentData(nullptr)
-    , m_currentDataSize(0)
-  {
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READFUNCTION, readCallback);
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READDATA, this);
-  }
-  
-  os::io::Library::v_size write(const void *data, os::io::Library::v_size count);
-  os::io::Library::v_size writeNonBlocking(const void *data, os::io::Library::v_size count);
-  
-};
+size_t CurlHeadersReader::headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
+  //CurlHeadersReader* instance = static_cast<CurlHeadersReader*>(userdata);
+  v_int32 strSize = (v_int32)(size * nmemb);
+  oatpp::String header(ptr, strSize, true);
+  OATPP_LOGD("curl", "headers::callback(). header='%s'", header->c_str());
+  return header->getSize();
+}
   
 }}
-
-#endif /* oatpp_curl_CurlWriter_hpp */

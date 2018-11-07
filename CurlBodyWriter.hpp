@@ -22,62 +22,43 @@
  *
  ***************************************************************************/
 
-#ifndef oatpp_curl_Curl_hpp
-#define oatpp_curl_Curl_hpp
+#ifndef oatpp_curl_CurlBodyWriter_hpp
+#define oatpp_curl_CurlBodyWriter_hpp
 
-#include "oatpp/core/Types.hpp"
+#include "./Curl.hpp"
 
-#include <curl/curl.h>
+#include "oatpp/core/data/stream/Stream.hpp"
+
+#include <memory>
 
 namespace oatpp { namespace curl {
   
-class CurlHeaders {
+/**
+ * This class is wrapper over curl handles to provide output-stream like interface
+ */
+class CurlBodyWriter {
 private:
-  curl_slist* m_list;
+  std::shared_ptr<CurlHandles> m_handles;
+  const void* m_currentData;
+  os::io::Library::v_size m_currentDataSize;
+private:
+  static size_t readCallback(char *buffer, size_t size, size_t nitems, void *userdata);
 public:
   
-  CurlHeaders();
-  ~CurlHeaders();
-  
-  void append(const oatpp::String& key, const oatpp::String& value);
-  
-  curl_slist* getCurlList() {
-    return m_list;
-  }
-  
-};
-  
-class CurlHandles {
-private:
-  CURL* m_easyhandle;
-  CURLM* m_multiHandle; // curl-multi is used for non-blocking perform
-public:
-  
-  CurlHandles()
-    : m_easyhandle(curl_easy_init())
-    , m_multiHandle(curl_multi_init())
+  CurlBodyWriter(const std::shared_ptr<CurlHandles>& curlHandles)
+    : m_handles(curlHandles)
+    , m_currentData(nullptr)
+    , m_currentDataSize(0)
   {
-    curl_multi_add_handle(m_multiHandle, m_easyhandle);
+    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READFUNCTION, readCallback);
+    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READDATA, this);
   }
   
-  ~CurlHandles() {
-    curl_multi_remove_handle(m_multiHandle, m_easyhandle);
-    curl_easy_cleanup(m_easyhandle);
-    curl_multi_cleanup(m_multiHandle);
-  }
-  
-  CURL* getEasyHandle() {
-    return m_easyhandle;
-  }
-  
-  CURLM* getMultiHandle() {
-    return m_multiHandle;
-  }
+  os::io::Library::v_size write(const void *data, os::io::Library::v_size count);
+  os::io::Library::v_size writeNonBlocking(const void *data, os::io::Library::v_size count);
   
 };
   
 }}
 
-
-
-#endif /* oatpp_curl_Curl_hpp */
+#endif /* oatpp_curl_CurlBodyWriter_hpp */

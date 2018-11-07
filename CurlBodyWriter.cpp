@@ -22,13 +22,13 @@
  *
  ***************************************************************************/
 
-#include "CurlWriter.hpp"
+#include "CurlBodyWriter.hpp"
 
 namespace oatpp { namespace curl {
   
-size_t CurlWriter::readCallback(char *buffer, size_t size, size_t nitems, void *userdata) {
+size_t CurlBodyWriter::readCallback(char *buffer, size_t size, size_t nitems, void *userdata) {
   OATPP_LOGD("curl", "writer::callback(data*, size=%d, nmemb=%d)", size, nitems);
-  CurlWriter* instance = static_cast<CurlWriter*>(userdata);
+  CurlBodyWriter* instance = static_cast<CurlBodyWriter*>(userdata);
   
   if(instance->m_currentData != nullptr) {
     auto readSize = size * nitems;
@@ -44,7 +44,7 @@ size_t CurlWriter::readCallback(char *buffer, size_t size, size_t nitems, void *
   return 0;
 }
   
-os::io::Library::v_size CurlWriter::write(const void *data, os::io::Library::v_size count) {
+os::io::Library::v_size CurlBodyWriter::write(const void *data, os::io::Library::v_size count) {
   
   os::io::Library::v_size writeCount;
   while ((writeCount = writeNonBlocking(data, count)) == oatpp::data::stream::Errors::ERROR_IO_RETRY) {
@@ -54,7 +54,7 @@ os::io::Library::v_size CurlWriter::write(const void *data, os::io::Library::v_s
   
 }
   
-os::io::Library::v_size CurlWriter::writeNonBlocking(const void *data, os::io::Library::v_size count) {
+os::io::Library::v_size CurlBodyWriter::writeNonBlocking(const void *data, os::io::Library::v_size count) {
   
   m_currentData = data;
   m_currentDataSize = count;

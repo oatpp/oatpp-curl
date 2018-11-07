@@ -22,40 +22,21 @@
  *
  ***************************************************************************/
 
-#ifndef oatpp_curl_CurlReader_hpp
-#define oatpp_curl_CurlReader_hpp
-
-#include "./Curl.hpp"
-
-#include "oatpp/core/data/stream/ChunkedBuffer.hpp"
+#include "BodyInputStream.hpp"
 
 namespace oatpp { namespace curl {
 
-/**
- * This class is wrapper over curl handles to provide input-stream like interface
- */
-class CurlReader {
-private:
-  std::shared_ptr<CurlHandles> m_handles;
-  oatpp::data::stream::ChunkedBuffer m_buffer;
-  os::io::Library::v_size m_position;
-private:
-  static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
-public:
-  
-  CurlReader(const std::shared_ptr<CurlHandles>& curlHandles)
-    : m_handles(curlHandles)
-    , m_position(0)
-  {
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEFUNCTION, writeCallback);
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEDATA, this);
+BodyInputStream::BodyInputStream(const std::shared_ptr<CurlBodyReader> reader, bool nonBlocking)
+  : m_reader(reader)
+  , m_nonBlocking(nonBlocking)
+{}
+
+os::io::Library::v_size BodyInputStream::read(void *data, os::io::Library::v_size count) {
+  if(m_nonBlocking) {
+    return m_reader->readNonBlocking(data, count);
+  } else {
+    return m_reader->read(data, count);
   }
-  
-  os::io::Library::v_size read(void *data, os::io::Library::v_size count);
-  os::io::Library::v_size readNonBlocking(void *data, os::io::Library::v_size count);
-  
-};
+}
   
 }}
-
-#endif /* oatpp_curl_CurlReader_hpp */

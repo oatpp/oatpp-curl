@@ -24,8 +24,9 @@
 
 #include "RequestExecutor.hpp"
 
-#include "CurlReader.hpp"
-#include "CurlWriter.hpp"
+#include "CurlHeadersReader.hpp"
+#include "CurlBodyReader.hpp"
+#include "CurlBodyWriter.hpp"
 
 #include <curl/curl.h>
 
@@ -37,37 +38,39 @@ namespace oatpp { namespace curl {
                                                                       const std::shared_ptr<Body>& body)
   {
   
-    oatpp::String host = "http://httpbin.org/put";
+    oatpp::String host = "http://httpbin.org/stream/4096";//"http://httpbin.org/put";
     oatpp::String url = host;// + path;
     
     auto curl = std::make_shared<CurlHandles>();
-    CurlReader reader(curl);
-    CurlWriter writer(curl);
+    CurlBodyReader reader(curl);
+    CurlBodyWriter writer(curl);
+    CurlHeadersReader headersReader(curl);
+    CurlHeaders headers;
+    std::shared_ptr<Headers> bodyHeaders;
     
-    CURLcode res;
-      
-    struct curl_slist *curlHeaders = nullptr;
+    headers.append("Expect", "");
     
-    /*
     if(userDefinedHeaders) {
       auto currHeader = userDefinedHeaders->getFirstEntry();
       while (currHeader != nullptr) {
-        oatpp::String headerEntry = currHeader->getKey() + ": " + currHeader->getValue();
-        curlHeaders = curl_slist_append(curlHeaders, headerEntry->c_str());
+        headers.append(currHeader->getKey(), currHeader->getValue());
         currHeader = currHeader->getNext();
       }
     }
-    */
     
-    curlHeaders = curl_slist_append(curlHeaders, "Expect:");
-    //curlHeaders = curl_slist_append(curlHeaders, "Content-Type: text/plain");
+    if(body) {
+      bodyHeaders = Headers::createShared();
+      body->declareHeaders(bodyHeaders);
+    }
     
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_URL, url->c_str());
-    curl_easy_setopt(curl->getEasyHandle(), CURLOPT_CUSTOMREQUEST, "PUT");
-    curl_easy_setopt(curl->getEasyHandle(), CURLOPT_HTTPHEADER, curlHeaders);
-    curl_easy_setopt(curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
+    curl_easy_setopt(curl->getEasyHandle(), CURLOPT_CUSTOMREQUEST, "GET");//method->c_str());
+    curl_easy_setopt(curl->getEasyHandle(), CURLOPT_HTTPHEADER, headers.getCurlList());
     
-    writer.write("long long data goes here", 24);
+    if(bodyHeaders) {
+      curl_easy_setopt(curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
+      writer.write("long long data goes here", 24);
+    }
     
     auto chunkedBuffer = oatpp::data::stream::ChunkedBuffer::createShared();
     v_char8 buffer [256];
@@ -79,10 +82,6 @@ namespace oatpp { namespace curl {
     
     OATPP_LOGD("result", "data='%s'", chunkedBuffer->toString()->c_str());
   
-    if(curlHeaders != nullptr) {
-      curl_slist_free_all(curlHeaders);
-    }
-    
     
     return nullptr;
   }

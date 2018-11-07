@@ -22,21 +22,32 @@
  *
  ***************************************************************************/
 
-#include "CurlReader.hpp"
+#include "CurlBodyReader.hpp"
 
 #include <chrono>
 
 namespace oatpp { namespace curl {
   
-size_t CurlReader::writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
+/*
+ * This callback may be called several times during one non-blocking perform.
+ * So check for (instance->m_position != 0). m_position == 0 means it was called multiple times in a row
+ * it can happen if response in chunked encoded
+ */
+size_t CurlBodyReader::writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
   OATPP_LOGD("curl", "reader::callback(data*, size=%d, nmemb=%d)", size, nmemb);
-  CurlReader* instance = static_cast<CurlReader*>(userdata);
-  instance->m_buffer.clear();
-  instance->m_position = 0;
+  CurlBodyReader* instance = static_cast<CurlBodyReader*>(userdata);
+  
+  if(instance->m_position != 0) {
+    if(instance->m_position != instance->m_buffer.getSize()){
+      throw std::runtime_error("[oatpp::curl::CurlBodyReader::writeCallback(...)]: Invalid state.");
+    }
+    instance->m_buffer.clear();
+    instance->m_position = 0;
+  }
   return instance->m_buffer.write(ptr, size * nmemb);
 }
   
-os::io::Library::v_size CurlReader::read(void *data, os::io::Library::v_size count) {
+os::io::Library::v_size CurlBodyReader::read(void *data, os::io::Library::v_size count) {
   os::io::Library::v_size readCount;
   while ((readCount = readNonBlocking(data, count)) == oatpp::data::stream::Errors::ERROR_IO_RETRY) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -44,16 +55,16 @@ os::io::Library::v_size CurlReader::read(void *data, os::io::Library::v_size cou
   return readCount;
 }
   
-os::io::Library::v_size CurlReader::readNonBlocking(void *data, os::io::Library::v_size count) {
+os::io::Library::v_size CurlBodyReader::readNonBlocking(void *data, os::io::Library::v_size count) {
   
-  os::io::Library::v_size availableBytes = m_buffer.getSize() - m_position;
+  os::io::Library::v_size availableBytes = getAvailableBytesCount();
   
   if(availableBytes == 0) {
     
     int still_running = 1;
     curl_multi_perform(m_handles->getMultiHandle(), &still_running);
     
-    availableBytes = m_buffer.getSize() - m_position;
+    availableBytes = getAvailableBytesCount();
     
     if(availableBytes == 0) {
       
@@ -71,6 +82,10 @@ os::io::Library::v_size CurlReader::readNonBlocking(void *data, os::io::Library:
   m_position += readCount;
   return readCount;
   
+}
+  
+os::io::Library::v_size CurlBodyReader::getAvailableBytesCount() {
+  return m_buffer.getSize() - m_position;
 }
   
 }}

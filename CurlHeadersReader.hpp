@@ -22,62 +22,34 @@
  *
  ***************************************************************************/
 
-#ifndef oatpp_curl_Curl_hpp
-#define oatpp_curl_Curl_hpp
+#ifndef oatpp_curl_CurlHeadersReader_hpp
+#define oatpp_curl_CurlHeadersReader_hpp
 
-#include "oatpp/core/Types.hpp"
+#include "./Curl.hpp"
 
-#include <curl/curl.h>
+#include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 
 namespace oatpp { namespace curl {
   
-class CurlHeaders {
+class CurlHeadersReader {
 private:
-  curl_slist* m_list;
+  std::shared_ptr<CurlHandles> m_handles;
+  oatpp::data::stream::ChunkedBuffer m_buffer;
+  os::io::Library::v_size m_position;
+private:
+  static size_t headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 public:
   
-  CurlHeaders();
-  ~CurlHeaders();
-  
-  void append(const oatpp::String& key, const oatpp::String& value);
-  
-  curl_slist* getCurlList() {
-    return m_list;
-  }
-  
-};
-  
-class CurlHandles {
-private:
-  CURL* m_easyhandle;
-  CURLM* m_multiHandle; // curl-multi is used for non-blocking perform
-public:
-  
-  CurlHandles()
-    : m_easyhandle(curl_easy_init())
-    , m_multiHandle(curl_multi_init())
+  CurlHeadersReader(const std::shared_ptr<CurlHandles>& curlHandles)
+    : m_handles(curlHandles)
+    , m_position(0)
   {
-    curl_multi_add_handle(m_multiHandle, m_easyhandle);
-  }
-  
-  ~CurlHandles() {
-    curl_multi_remove_handle(m_multiHandle, m_easyhandle);
-    curl_easy_cleanup(m_easyhandle);
-    curl_multi_cleanup(m_multiHandle);
-  }
-  
-  CURL* getEasyHandle() {
-    return m_easyhandle;
-  }
-  
-  CURLM* getMultiHandle() {
-    return m_multiHandle;
+    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERFUNCTION, headerCallback);
+    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERDATA, this);
   }
   
 };
   
 }}
 
-
-
-#endif /* oatpp_curl_Curl_hpp */
+#endif /* oatpp_curl_CurlHeadersReader_hpp */

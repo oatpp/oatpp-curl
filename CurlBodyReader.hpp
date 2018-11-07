@@ -22,62 +22,42 @@
  *
  ***************************************************************************/
 
-#ifndef oatpp_curl_Curl_hpp
-#define oatpp_curl_Curl_hpp
+#ifndef oatpp_curl_CurlBodyReader_hpp
+#define oatpp_curl_CurlBodyReader_hpp
 
-#include "oatpp/core/Types.hpp"
+#include "./Curl.hpp"
 
-#include <curl/curl.h>
+#include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 
 namespace oatpp { namespace curl {
-  
-class CurlHeaders {
+
+/**
+ * This class is wrapper over curl handles to provide input-stream like interface
+ */
+class CurlBodyReader {
 private:
-  curl_slist* m_list;
+  std::shared_ptr<CurlHandles> m_handles;
+  oatpp::data::stream::ChunkedBuffer m_buffer;
+  os::io::Library::v_size m_position;
+private:
+  static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 public:
   
-  CurlHeaders();
-  ~CurlHeaders();
-  
-  void append(const oatpp::String& key, const oatpp::String& value);
-  
-  curl_slist* getCurlList() {
-    return m_list;
-  }
-  
-};
-  
-class CurlHandles {
-private:
-  CURL* m_easyhandle;
-  CURLM* m_multiHandle; // curl-multi is used for non-blocking perform
-public:
-  
-  CurlHandles()
-    : m_easyhandle(curl_easy_init())
-    , m_multiHandle(curl_multi_init())
+  CurlBodyReader(const std::shared_ptr<CurlHandles>& curlHandles)
+    : m_handles(curlHandles)
+    , m_position(0)
   {
-    curl_multi_add_handle(m_multiHandle, m_easyhandle);
+    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEDATA, this);
   }
   
-  ~CurlHandles() {
-    curl_multi_remove_handle(m_multiHandle, m_easyhandle);
-    curl_easy_cleanup(m_easyhandle);
-    curl_multi_cleanup(m_multiHandle);
-  }
+  os::io::Library::v_size read(void *data, os::io::Library::v_size count);
+  os::io::Library::v_size readNonBlocking(void *data, os::io::Library::v_size count);
   
-  CURL* getEasyHandle() {
-    return m_easyhandle;
-  }
-  
-  CURLM* getMultiHandle() {
-    return m_multiHandle;
-  }
+  os::io::Library::v_size getAvailableBytesCount();
   
 };
   
 }}
 
-
-
-#endif /* oatpp_curl_Curl_hpp */
+#endif /* oatpp_curl_CurlBodyReader_hpp */
