@@ -24,10 +24,9 @@
 
 #include "CurlBodyWriter.hpp"
 
-namespace oatpp { namespace curl {
+namespace oatpp { namespace curl { namespace io {
   
 size_t CurlBodyWriter::readCallback(char *buffer, size_t size, size_t nitems, void *userdata) {
-  OATPP_LOGD("curl", "writer::callback(data*, size=%d, nmemb=%d)", size, nitems);
   CurlBodyWriter* instance = static_cast<CurlBodyWriter*>(userdata);
   
   if(instance->m_currentData != nullptr) {
@@ -72,4 +71,4 @@ os::io::Library::v_size CurlBodyWriter::writeNonBlocking(const void *data, os::i
   
 }
   
-}}
+}}}

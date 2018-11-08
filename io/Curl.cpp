@@ -22,21 +22,23 @@
  *
  ***************************************************************************/
 
-#include "BodyInputStream.hpp"
+#include "Curl.hpp"
 
-namespace oatpp { namespace curl {
-
-BodyInputStream::BodyInputStream(const std::shared_ptr<CurlBodyReader> reader, bool nonBlocking)
-  : m_reader(reader)
-  , m_nonBlocking(nonBlocking)
+namespace oatpp { namespace curl { namespace io {
+  
+CurlHeaders::CurlHeaders()
+  : m_list(nullptr)
 {}
 
-os::io::Library::v_size BodyInputStream::read(void *data, os::io::Library::v_size count) {
-  if(m_nonBlocking) {
-    return m_reader->readNonBlocking(data, count);
-  } else {
-    return m_reader->read(data, count);
+CurlHeaders::~CurlHeaders() {
+  if(m_list != nullptr) {
+    curl_slist_free_all(m_list);
   }
 }
   
-}}
+void CurlHeaders::append(const oatpp::String& key, const oatpp::String& value) {
+  oatpp::String headerEntry = key + ": " + value;
+  m_list = curl_slist_append(m_list, headerEntry->c_str());
+}
+  
+}}}

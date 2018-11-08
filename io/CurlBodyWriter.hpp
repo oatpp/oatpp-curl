@@ -31,7 +31,7 @@
 
 #include <memory>
 
-namespace oatpp { namespace curl {
+namespace oatpp { namespace curl { namespace io {
   
 /**
  * This class is wrapper over curl handles to provide output-stream like interface
@@ -59,6 +59,6 @@ public:
   
 };
   
-}}
+}}}
 
 #endif /* oatpp_curl_CurlBodyWriter_hpp */

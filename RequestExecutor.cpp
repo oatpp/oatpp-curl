@@ -24,10 +24,11 @@
 
 #include "RequestExecutor.hpp"
 
-#include "BodyInputStream.hpp"
-#include "CurlHeadersReader.hpp"
-#include "CurlBodyReader.hpp"
-#include "CurlBodyWriter.hpp"
+#include "./io/BodyInputStream.hpp"
+#include "./io/BodyOutputStream.hpp"
+#include "./io/CurlHeadersReader.hpp"
+#include "./io/CurlBodyReader.hpp"
+#include "./io/CurlBodyWriter.hpp"
 
 #include <curl/curl.h>
 #include <chrono>
@@ -42,11 +43,11 @@ namespace oatpp { namespace curl {
     
     oatpp::String url = m_baseUrl + path;
     
-    auto curl = std::make_shared<CurlHandles>();
-    auto reader = std::make_shared<CurlBodyReader>(curl);
-    CurlBodyWriter writer(curl);
-    CurlHeadersReader headersReader(curl);
-    CurlHeaders headers;
+    auto curl = std::make_shared<io::CurlHandles>();
+    auto reader = std::make_shared<io::CurlBodyReader>(curl);
+    auto writer = std::make_shared<io::CurlBodyWriter>(curl);
+    io::CurlHeadersReader headersReader(curl);
+    io::CurlHeaders headers;
     std::shared_ptr<Headers> bodyHeaders;
     
     headers.append("Expect", "");
@@ -70,35 +71,22 @@ namespace oatpp { namespace curl {
     
     if(bodyHeaders) {
       curl_easy_setopt(curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
-      writer.write("long long data goes here", 24);
+      body->writeToStream(std::make_shared<io::BodyOutputStream>(writer));
     }
     
     int still_running = 1;
     curl_multi_perform(curl->getMultiHandle(), &still_running);
-    while (still_running && headersReader.getState() == CurlHeadersReader::STATE_INITIALIZED) {
+    while (still_running && headersReader.getState() != io::CurlHeadersReader::STATE_FINISHED) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
       curl_multi_perform(curl->getMultiHandle(), &still_running);
-    }
-    
-    if(!still_running) {
-      throw std::runtime_error("[oatpp::curl::RequestExecutor::execute()]: Unknown error.");
-    }
-    
-    while (still_running && headersReader.getState() != CurlHeadersReader::STATE_FINISHED) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      curl_multi_perform(curl->getMultiHandle(), &still_running);
-    }
-    
-    if(!still_running) {
-      throw std::runtime_error("[oatpp::curl::RequestExecutor::execute()]: Unknown error.");
     }
     
     auto line = headersReader.getStartingLine();
     auto responseHeaders = headersReader.getHeaders();
     
-    auto bodyStream = std::make_shared<BodyInputStream>(reader, false);
+    auto bodyStream = std::make_shared<io::BodyInputStream>(reader, false);
     
-    return Response::createShared(line->statusCode, line->description, responseHeaders, bodyStream);
+    return Response::createShared(line->statusCode, line->description, responseHeaders, bodyStream, m_bodyDecoder);
   }
   
 }}

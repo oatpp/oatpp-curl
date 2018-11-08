@@ -25,6 +25,8 @@
 #ifndef oatpp_curl_RequestExecutor_hpp
 #define oatpp_curl_RequestExecutor_hpp
 
+#include "./io/BodyDecoder.hpp"
+
 #include "oatpp/web/client/RequestExecutor.hpp"
 
 namespace oatpp { namespace curl {
@@ -32,10 +34,12 @@ namespace oatpp { namespace curl {
 class RequestExecutor : public oatpp::web::client::RequestExecutor {
 private:
   oatpp::String m_baseUrl;
+  std::shared_ptr<io::BodyDecoder> m_bodyDecoder;
 public:
   
   RequestExecutor(const oatpp::String& baseUrl)
     : m_baseUrl(baseUrl)
+    , m_bodyDecoder(std::make_shared<io::BodyDecoder>())
   {}
   
   std::shared_ptr<Response> execute(const String& method,

@@ -30,7 +30,7 @@
 #include "oatpp/web/protocol/http/Http.hpp"
 #include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 
-namespace oatpp { namespace curl {
+namespace oatpp { namespace curl { namespace io {
   
 class CurlHeadersReader {
 public:
@@ -72,6 +72,6 @@ public:
   
 };
   
-}}
+}}}
 
 #endif /* oatpp_curl_CurlHeadersReader_hpp */

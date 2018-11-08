@@ -26,7 +26,7 @@
 
 #include <chrono>
 
-namespace oatpp { namespace curl {
+namespace oatpp { namespace curl { namespace io {
   
 /*
  * This callback may be called several times during one non-blocking perform.
@@ -34,7 +34,6 @@ namespace oatpp { namespace curl {
  * it can happen if response in chunked encoded
  */
 size_t CurlBodyReader::writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-  OATPP_LOGD("curl", "reader::callback(data*, size=%d, nmemb=%d)", size, nmemb);
   CurlBodyReader* instance = static_cast<CurlBodyReader*>(userdata);
   
   if(instance->m_position != 0) {
@@ -71,7 +70,7 @@ os::io::Library::v_size CurlBodyReader::readNonBlocking(void *data, os::io::Libr
       if(still_running) {
         return oatpp::data::stream::Errors::ERROR_IO_RETRY;
       } else {
-        return oatpp::data::stream::Errors::ERROR_IO_PIPE;
+        return oatpp::data::stream::Errors::ERROR_IO_NOTHING_TO_READ;
       }
       
     }
@@ -88,4 +87,4 @@ os::io::Library::v_size CurlBodyReader::getAvailableBytesCount() {
   return m_buffer.getSize() - m_position;
 }
   
-}}
+}}}

@@ -22,62 +22,21 @@
  *
  ***************************************************************************/
 
-#ifndef oatpp_curl_Curl_hpp
-#define oatpp_curl_Curl_hpp
+#include "BodyOutputStream.hpp"
 
-#include "oatpp/core/Types.hpp"
+namespace oatpp { namespace curl { namespace io {
+  
+BodyOutputStream::BodyOutputStream(const std::shared_ptr<CurlBodyWriter> writer, bool nonBlocking)
+  : m_writer(writer)
+  , m_nonBlocking(nonBlocking)
+{}
 
-#include <curl/curl.h>
-
-namespace oatpp { namespace curl {
-  
-class CurlHeaders {
-private:
-  curl_slist* m_list;
-public:
-  
-  CurlHeaders();
-  ~CurlHeaders();
-  
-  void append(const oatpp::String& key, const oatpp::String& value);
-  
-  curl_slist* getCurlList() {
-    return m_list;
+os::io::Library::v_size BodyOutputStream::write(const void *data, os::io::Library::v_size count) {
+  if(m_nonBlocking) {
+    return m_writer->writeNonBlocking(data, count);
+  } else {
+    return m_writer->write(data, count);
   }
+}
   
-};
-  
-class CurlHandles {
-private:
-  CURL* m_easyhandle;
-  CURLM* m_multiHandle; // curl-multi is used for non-blocking perform
-public:
-  
-  CurlHandles()
-    : m_easyhandle(curl_easy_init())
-    , m_multiHandle(curl_multi_init())
-  {
-    curl_multi_add_handle(m_multiHandle, m_easyhandle);
-  }
-  
-  ~CurlHandles() {
-    curl_multi_remove_handle(m_multiHandle, m_easyhandle);
-    curl_easy_cleanup(m_easyhandle);
-    curl_multi_cleanup(m_multiHandle);
-  }
-  
-  CURL* getEasyHandle() {
-    return m_easyhandle;
-  }
-  
-  CURLM* getMultiHandle() {
-    return m_multiHandle;
-  }
-  
-};
-  
-}}
-
-
-
-#endif /* oatpp_curl_Curl_hpp */
+}}}
