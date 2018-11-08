@@ -42,20 +42,21 @@ public:
     , m_bodyDecoder(std::make_shared<io::BodyDecoder>())
   {}
   
+  static std::shared_ptr<RequestExecutor> createShared(const oatpp::String& baseUrl) {
+    return std::make_shared<RequestExecutor>(baseUrl);
+  }
+  
   std::shared_ptr<Response> execute(const String& method,
                                     const String& path,
                                     const std::shared_ptr<Headers>& userDefinedHeaders,
                                     const std::shared_ptr<Body>& body) override;
   
   Action executeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
-                              AsyncCallback callback,
-                              const String& method,
-                              const String& path,
-                              const std::shared_ptr<Headers>& headers,
-                              const std::shared_ptr<Body>& body) override {
-    OATPP_LOGD("Executor", "AsyncCall::");
-    return Action::_FINISH;
-  }
+                      AsyncCallback callback,
+                      const String& method,
+                      const String& path,
+                      const std::shared_ptr<Headers>& headers,
+                      const std::shared_ptr<Body>& body) override;
   
 };
   
