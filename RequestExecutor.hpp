@@ -35,15 +35,17 @@ class RequestExecutor : public oatpp::web::client::RequestExecutor {
 private:
   oatpp::String m_baseUrl;
   std::shared_ptr<io::BodyDecoder> m_bodyDecoder;
+  bool m_verbose;
 public:
   
-  RequestExecutor(const oatpp::String& baseUrl)
+  RequestExecutor(const oatpp::String& baseUrl, bool verbose = false)
     : m_baseUrl(baseUrl)
     , m_bodyDecoder(std::make_shared<io::BodyDecoder>())
+    , m_verbose(verbose)
   {}
   
-  static std::shared_ptr<RequestExecutor> createShared(const oatpp::String& baseUrl) {
-    return std::make_shared<RequestExecutor>(baseUrl);
+  static std::shared_ptr<RequestExecutor> createShared(const oatpp::String& baseUrl, bool verbose = false) {
+    return std::make_shared<RequestExecutor>(baseUrl, verbose);
   }
   
   std::shared_ptr<Response> execute(const String& method,

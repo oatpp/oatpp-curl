@@ -65,6 +65,10 @@ namespace oatpp { namespace curl {
       body->declareHeaders(bodyHeaders);
     }
     
+    if(m_verbose) {
+      curl_easy_setopt(curl->getEasyHandle(), CURLOPT_VERBOSE, 1L);
+    }
+    
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_URL, url->c_str());
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_CUSTOMREQUEST, method->c_str());
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_HTTPHEADER, headers.getCurlList());
@@ -101,22 +105,24 @@ namespace oatpp { namespace curl {
     private:
       std::shared_ptr<Body> m_body;
       std::shared_ptr<const oatpp::web::protocol::http::incoming::BodyDecoder> m_bodyDecoder;
+      bool m_verbose;
     private:
       std::shared_ptr<io::CurlHandles> m_curl;
       std::shared_ptr<io::CurlBodyReader> m_reader;
       std::shared_ptr<io::CurlBodyWriter> m_writer;
       std::shared_ptr<io::CurlHeadersReader> m_headersReader;
       io::CurlHeaders m_curlHeaders;
-      
     public:
       
       ExecutorCoroutine(const oatpp::String& url,
                         const String& method,
                         const std::shared_ptr<Headers>& headers,
                         const std::shared_ptr<Body>& body,
-                        const std::shared_ptr<const oatpp::web::protocol::http::incoming::BodyDecoder>& bodyDecoder)
+                        const std::shared_ptr<const oatpp::web::protocol::http::incoming::BodyDecoder>& bodyDecoder,
+                        bool verbose)
         : m_body(body)
         , m_bodyDecoder(bodyDecoder)
+        , m_verbose(verbose)
       {
         
         m_curl = std::make_shared<io::CurlHandles>();
@@ -134,6 +140,10 @@ namespace oatpp { namespace curl {
             m_curlHeaders.append(currHeader->getKey(), currHeader->getValue());
             currHeader = currHeader->getNext();
           }
+        }
+        
+        if(m_verbose) {
+          curl_easy_setopt(m_curl->getEasyHandle(), CURLOPT_VERBOSE, 1L);
         }
         
         curl_easy_setopt(m_curl->getEasyHandle(), CURLOPT_URL, url->c_str());
@@ -175,7 +185,7 @@ namespace oatpp { namespace curl {
       
     };
     
-    return parentCoroutine->startCoroutineForResult<ExecutorCoroutine>(callback, m_baseUrl + path, method, headers, body, m_bodyDecoder);
+    return parentCoroutine->startCoroutineForResult<ExecutorCoroutine>(callback, m_baseUrl + path, method, headers, body, m_bodyDecoder, m_verbose);
     
   }
   
