@@ -38,7 +38,8 @@ namespace oatpp { namespace curl {
   std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String& method,
                                                                       const String& path,
                                                                       const std::shared_ptr<Headers>& userDefinedHeaders,
-                                                                      const std::shared_ptr<Body>& body)
+                                                                      const std::shared_ptr<Body>& body,
+                                                                      const std::shared_ptr<ConnectionHandle>& connectionHandle)
   {
     
     oatpp::String url = m_baseUrl + path;
@@ -98,7 +99,8 @@ namespace oatpp { namespace curl {
                                                      const String& method,
                                                      const String& path,
                                                      const std::shared_ptr<Headers>& headers,
-                                                     const std::shared_ptr<Body>& body)
+                                                     const std::shared_ptr<Body>& body,
+                                                     const std::shared_ptr<ConnectionHandle>& connectionHandle)
   {
     
     class ExecutorCoroutine : public oatpp::async::CoroutineWithResult<ExecutorCoroutine, std::shared_ptr<Response>> {

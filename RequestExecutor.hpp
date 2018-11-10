@@ -48,17 +48,27 @@ public:
     return std::make_shared<RequestExecutor>(baseUrl, verbose);
   }
   
+  std::shared_ptr<ConnectionHandle> getConnection() override {
+    throw std::runtime_error("[oatpp::curl::RequestExecutor::getConnection()]: Error. This call is not implemented yet");
+  }
+  
+  Action getConnectionAsync(oatpp::async::AbstractCoroutine* parentCoroutine, AsyncConnectionCallback callback) override {
+    throw std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");
+  }
+  
   std::shared_ptr<Response> execute(const String& method,
                                     const String& path,
                                     const std::shared_ptr<Headers>& userDefinedHeaders,
-                                    const std::shared_ptr<Body>& body) override;
+                                    const std::shared_ptr<Body>& body,
+                                    const std::shared_ptr<ConnectionHandle>& connectionHandle = nullptr) override;
   
   Action executeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
                       AsyncCallback callback,
                       const String& method,
                       const String& path,
                       const std::shared_ptr<Headers>& headers,
-                      const std::shared_ptr<Body>& body) override;
+                      const std::shared_ptr<Body>& body,
+                      const std::shared_ptr<ConnectionHandle>& connectionHandle = nullptr) override;
   
 };
   
