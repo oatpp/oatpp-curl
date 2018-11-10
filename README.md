@@ -6,6 +6,7 @@ It supports all features of oatpp ApiClient together with Synchronous and Asynch
 More about oat++:
 - Website: [https://oatpp.io](https://oatpp.io)
 - ```ApiClient``` docs: [https://oatpp.io/docs/component/api-client](https://oatpp.io/docs/component/api-client)
+- Complete example: [oatpp-examples/ApiClient-Demo](https://github.com/oatpp/oatpp-examples/tree/master/ApiClient-Demo)
 
 ## Requires
 
