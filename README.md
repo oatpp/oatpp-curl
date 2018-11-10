@@ -20,7 +20,7 @@ Under the hood it uses provided ```RequestExecutor``` to perform http requests. 
 
 ### Example
 
-*This example is partially take from [oatpp-consul](https://github.com/oatpp/oatpp-consul) implementation*  
+*This example is partially taken from [oatpp-consul](https://github.com/oatpp/oatpp-consul) implementation*  
 
 #### Declare ApiClient
 
