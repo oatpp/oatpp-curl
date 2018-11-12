@@ -6,16 +6,16 @@ It supports all features of oatpp ApiClient together with Synchronous and Asynch
 More about oat++:
 - Website: [https://oatpp.io](https://oatpp.io)
 - ```ApiClient``` docs: [https://oatpp.io/docs/component/api-client](https://oatpp.io/docs/component/api-client)
-- Complete example: [oatpp-examples/ApiClient-Demo](https://github.com/oatpp/oatpp-examples/tree/master/ApiClient-Demo)
+- Usage example: [oatpp-examples/ApiClient-Demo](https://github.com/oatpp/oatpp-examples/tree/master/ApiClient-Demo)
 
 ## Requires
 
 libcurl installed.
 
-## Overview
+## oatpp ApiClient ?
 
 oatpp ```ApiClient``` is a mechanism which enables you to generate Web Api Clients in declarative manner.
-Under the hood it uses provided ```RequestExecutor``` to perform http requests. Thus you are abstracted from the low-level http-client library implementation and can substitute any other http-client library at any time with zero code changes.  
+Under the hood it uses provided ```RequestExecutor``` (ex.: ```oatpp::curl::RequestExecutor```) to perform http requests. Thus you are abstracted from the low-level http-client library implementation and can substitute any other http-client library at any time with zero code changes.  
 *Roughly you may treat oatpp ```ApiClient``` as Java Retrofit for C++.*
 
 ### Example
