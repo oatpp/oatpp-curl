@@ -36,7 +36,7 @@ public:
    * Just transfer everything we have in @bodyStream to @toStream as-is
    * Curl already did all decoding
    */
-  void decode(const std::shared_ptr<oatpp::web::protocol::http::Protocol::Headers>& headers,
+  void decode(const oatpp::web::protocol::http::Protocol::Headers& headers,
               const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
               const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const override;
   
@@ -46,7 +46,7 @@ public:
    */
   oatpp::async::Action decodeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
                                    const oatpp::async::Action& actionOnReturn,
-                                   const std::shared_ptr<oatpp::web::protocol::http::Protocol::Headers>& headers,
+                                   const oatpp::web::protocol::http::Protocol::Headers& headers,
                                    const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
                                    const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const override;
   

@@ -41,8 +41,8 @@ private:
   std::shared_ptr<CurlHandles> m_handles;
   os::io::Library::v_size m_position;
   v_int32 m_state;
-  std::shared_ptr<oatpp::web::protocol::http::Protocol::Headers> m_headers;
-  std::shared_ptr<oatpp::web::protocol::http::ResponseStartingLine> m_startingLine;
+  oatpp::web::protocol::http::Protocol::Headers m_headers;
+  oatpp::web::protocol::http::ResponseStartingLine m_startingLine;
   oatpp::data::stream::ChunkedBuffer m_buffer;
 private:
   static size_t headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
@@ -52,7 +52,6 @@ public:
     : m_handles(curlHandles)
     , m_position(0)
     , m_state(STATE_INITIALIZED)
-    , m_headers(oatpp::web::protocol::http::Protocol::Headers::createShared())
   {
     curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERFUNCTION, headerCallback);
     curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERDATA, this);
@@ -62,11 +61,11 @@ public:
     return m_state;
   }
   
-  std::shared_ptr<oatpp::web::protocol::http::ResponseStartingLine> getStartingLine() {
+  const oatpp::web::protocol::http::ResponseStartingLine& getStartingLine() const {
     return m_startingLine;
   }
   
-  std::shared_ptr<oatpp::web::protocol::http::Protocol::Headers> getHeaders() {
+  const oatpp::web::protocol::http::Protocol::Headers& getHeaders() const {
     return m_headers;
   }
   

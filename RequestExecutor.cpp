@@ -37,7 +37,7 @@ namespace oatpp { namespace curl {
   
   std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String& method,
                                                                       const String& path,
-                                                                      const std::shared_ptr<Headers>& userDefinedHeaders,
+                                                                      const Headers& userDefinedHeaders,
                                                                       const std::shared_ptr<Body>& body,
                                                                       const std::shared_ptr<ConnectionHandle>& connectionHandle)
   {
@@ -49,20 +49,19 @@ namespace oatpp { namespace curl {
     auto writer = std::make_shared<io::CurlBodyWriter>(curl);
     io::CurlHeadersReader headersReader(curl);
     io::CurlHeaders headers;
-    std::shared_ptr<Headers> bodyHeaders;
+    Headers bodyHeaders;
     
     headers.append("Expect", "");
     
-    if(userDefinedHeaders) {
-      auto currHeader = userDefinedHeaders->getFirstEntry();
-      while (currHeader != nullptr) {
-        headers.append(currHeader->getKey(), currHeader->getValue());
-        currHeader = currHeader->getNext();
+    if(!userDefinedHeaders.empty()) {
+      auto currHeaderIt = userDefinedHeaders.begin();
+      while (currHeaderIt != userDefinedHeaders.end()) {
+        headers.append(currHeaderIt->first.toString(), currHeaderIt->second.toString());
+        currHeaderIt++;
       }
     }
     
     if(body) {
-      bodyHeaders = Headers::createShared();
       body->declareHeaders(bodyHeaders);
     }
     
@@ -74,7 +73,7 @@ namespace oatpp { namespace curl {
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_CUSTOMREQUEST, method->c_str());
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_HTTPHEADER, headers.getCurlList());
     
-    if(bodyHeaders) {
+    if(!bodyHeaders.empty()) {
       curl_easy_setopt(curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
       body->writeToStream(std::make_shared<io::BodyOutputStream>(writer));
     }
@@ -91,14 +90,14 @@ namespace oatpp { namespace curl {
     
     auto bodyStream = std::make_shared<io::BodyInputStream>(reader, false);
     
-    return Response::createShared(line->statusCode, line->description, responseHeaders, bodyStream, m_bodyDecoder);
+    return Response::createShared(line.statusCode, line.description.toString(), responseHeaders, bodyStream, m_bodyDecoder);
   }
   
   oatpp::async::Action RequestExecutor::executeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
                                                      AsyncCallback callback,
                                                      const String& method,
                                                      const String& path,
-                                                     const std::shared_ptr<Headers>& headers,
+                                                     const Headers& headers,
                                                      const std::shared_ptr<Body>& body,
                                                      const std::shared_ptr<ConnectionHandle>& connectionHandle)
   {
@@ -118,7 +117,7 @@ namespace oatpp { namespace curl {
       
       ExecutorCoroutine(const oatpp::String& url,
                         const String& method,
-                        const std::shared_ptr<Headers>& headers,
+                        const Headers& headers,
                         const std::shared_ptr<Body>& body,
                         const std::shared_ptr<const oatpp::web::protocol::http::incoming::BodyDecoder>& bodyDecoder,
                         bool verbose)
@@ -132,15 +131,15 @@ namespace oatpp { namespace curl {
         m_writer = std::make_shared<io::CurlBodyWriter>(m_curl);
         m_headersReader = std::make_shared<io::CurlHeadersReader>(m_curl);
         
-        std::shared_ptr<Headers> bodyHeaders;
+        Headers bodyHeaders;
         
         m_curlHeaders.append("Expect", "");
         
-        if(headers) {
-          auto currHeader = headers->getFirstEntry();
-          while (currHeader != nullptr) {
-            m_curlHeaders.append(currHeader->getKey(), currHeader->getValue());
-            currHeader = currHeader->getNext();
+        if(!headers.empty()) {
+          auto currHeaderIt = headers.begin();
+          while (currHeaderIt != headers.end()) {
+            m_curlHeaders.append(currHeaderIt->first.toString(), currHeaderIt->second.toString());
+            currHeaderIt ++;
           }
         }
         
@@ -153,7 +152,6 @@ namespace oatpp { namespace curl {
         curl_easy_setopt(m_curl->getEasyHandle(), CURLOPT_HTTPHEADER, m_curlHeaders.getCurlList());
         
         if(m_body) {
-          bodyHeaders = Headers::createShared();
           m_body->declareHeaders(bodyHeaders);
           curl_easy_setopt(m_curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
         }
@@ -181,7 +179,7 @@ namespace oatpp { namespace curl {
         auto responseHeaders = m_headersReader->getHeaders();
         auto bodyStream = std::make_shared<io::BodyInputStream>(m_reader, true /* non-blocking */);
         
-        return _return(Response::createShared(line->statusCode, line->description, responseHeaders, bodyStream, m_bodyDecoder));
+        return _return(Response::createShared(line.statusCode, line.description.toString(), responseHeaders, bodyStream, m_bodyDecoder));
         
       }
       

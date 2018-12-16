@@ -25,22 +25,24 @@
 #include "CurlHeadersReader.hpp"
 
 namespace oatpp { namespace curl { namespace io {
-  
+    
 size_t CurlHeadersReader::headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
   
-  oatpp::parser::ParsingCaret caret((p_char8)ptr, (v_int32)(size * nmemb));
+  oatpp::String capturedText = oatpp::String(ptr, (v_int32)(size * nmemb));
+  oatpp::parser::ParsingCaret caret(capturedText);
   
   CurlHeadersReader* instance = static_cast<CurlHeadersReader*>(userdata);
   
   if(instance->m_state == STATE_INITIALIZED) {
     instance->m_state = STATE_STARTED;
-    instance->m_startingLine = oatpp::web::protocol::http::Protocol::parseResponseStartingLine(caret);
+    oatpp::web::protocol::http::Status error;
+    oatpp::web::protocol::http::Protocol::parseResponseStartingLine(instance->m_startingLine, capturedText.getPtr(), caret, error);
   } else if(instance->m_state == STATE_STARTED) {
     if(caret.isAtRN()) {
       instance->m_state = STATE_FINISHED;
     }
     oatpp::web::protocol::http::Status error;
-    oatpp::web::protocol::http::Protocol::parseOneHeader(*instance->m_headers, caret, error);
+    oatpp::web::protocol::http::Protocol::parseOneHeader(instance->m_headers, capturedText.getPtr(), caret, error);
   } else if(instance->m_state == STATE_FINISHED) {
     throw std::runtime_error("[oatpp::curl::CurlHeadersReader::headerCallback(...)]: Invalid state.");
   }
