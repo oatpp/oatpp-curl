@@ -31,7 +31,7 @@ BodyOutputStream::BodyOutputStream(const std::shared_ptr<CurlBodyWriter> writer,
   , m_nonBlocking(nonBlocking)
 {}
 
-os::io::Library::v_size BodyOutputStream::write(const void *data, os::io::Library::v_size count) {
+data::v_io_size BodyOutputStream::write(const void *data, data::v_io_size count) {
   if(m_nonBlocking) {
     return m_writer->writeNonBlocking(data, count);
   } else {

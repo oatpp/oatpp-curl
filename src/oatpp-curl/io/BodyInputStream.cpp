@@ -31,7 +31,7 @@ BodyInputStream::BodyInputStream(const std::shared_ptr<CurlBodyReader> reader, b
   , m_nonBlocking(nonBlocking)
 {}
 
-os::io::Library::v_size BodyInputStream::read(void *data, os::io::Library::v_size count) {
+data::v_io_size BodyInputStream::read(void *data, data::v_io_size count) {
   if(m_nonBlocking) {
     return m_reader->readNonBlocking(data, count);
   } else {

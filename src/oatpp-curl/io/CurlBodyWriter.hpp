@@ -40,7 +40,7 @@ class CurlBodyWriter {
 private:
   std::shared_ptr<CurlHandles> m_handles;
   const void* m_currentData;
-  os::io::Library::v_size m_currentDataSize;
+  data::v_io_size m_currentDataSize;
 private:
   static size_t readCallback(char *buffer, size_t size, size_t nitems, void *userdata);
 public:
@@ -54,8 +54,8 @@ public:
     curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READDATA, this);
   }
   
-  os::io::Library::v_size write(const void *data, os::io::Library::v_size count);
-  os::io::Library::v_size writeNonBlocking(const void *data, os::io::Library::v_size count);
+  data::v_io_size write(const void *data, data::v_io_size count);
+  data::v_io_size writeNonBlocking(const void *data, data::v_io_size count);
   
 };
   

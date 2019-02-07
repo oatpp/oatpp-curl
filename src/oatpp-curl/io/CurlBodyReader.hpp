@@ -38,7 +38,7 @@ class CurlBodyReader {
 private:
   std::shared_ptr<CurlHandles> m_handles;
   oatpp::data::stream::ChunkedBuffer m_buffer;
-  os::io::Library::v_size m_position;
+  data::v_io_size m_position;
 private:
   static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 public:
@@ -51,10 +51,10 @@ public:
     curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEDATA, this);
   }
   
-  os::io::Library::v_size read(void *data, os::io::Library::v_size count);
-  os::io::Library::v_size readNonBlocking(void *data, os::io::Library::v_size count);
+  data::v_io_size read(void *data, data::v_io_size count);
+  data::v_io_size readNonBlocking(void *data, data::v_io_size count);
   
-  os::io::Library::v_size getAvailableBytesCount();
+  data::v_io_size getAvailableBytesCount();
   
 };
   

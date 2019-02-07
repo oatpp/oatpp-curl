@@ -46,17 +46,17 @@ size_t CurlBodyReader::writeCallback(char *ptr, size_t size, size_t nmemb, void 
   return instance->m_buffer.write(ptr, size * nmemb);
 }
   
-os::io::Library::v_size CurlBodyReader::read(void *data, os::io::Library::v_size count) {
-  os::io::Library::v_size readCount;
-  while ((readCount = readNonBlocking(data, count)) == oatpp::data::stream::Errors::ERROR_IO_RETRY) {
+data::v_io_size CurlBodyReader::read(void *data, data::v_io_size count) {
+  data::v_io_size readCount;
+  while ((readCount = readNonBlocking(data, count)) == oatpp::data::IOError::WAIT_RETRY) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   return readCount;
 }
   
-os::io::Library::v_size CurlBodyReader::readNonBlocking(void *data, os::io::Library::v_size count) {
+data::v_io_size CurlBodyReader::readNonBlocking(void *data, data::v_io_size count) {
   
-  os::io::Library::v_size availableBytes = getAvailableBytesCount();
+  data::v_io_size availableBytes = getAvailableBytesCount();
   
   if(availableBytes == 0) {
     
@@ -68,9 +68,9 @@ os::io::Library::v_size CurlBodyReader::readNonBlocking(void *data, os::io::Libr
     if(availableBytes == 0) {
       
       if(still_running) {
-        return oatpp::data::stream::Errors::ERROR_IO_RETRY;
+        return oatpp::data::IOError::WAIT_RETRY;
       } else {
-        return oatpp::data::stream::Errors::ERROR_IO_NOTHING_TO_READ;
+        return oatpp::data::IOError::BROKEN_PIPE;
       }
       
     }
@@ -83,7 +83,7 @@ os::io::Library::v_size CurlBodyReader::readNonBlocking(void *data, os::io::Libr
   
 }
   
-os::io::Library::v_size CurlBodyReader::getAvailableBytesCount() {
+data::v_io_size CurlBodyReader::getAvailableBytesCount() {
   return m_buffer.getSize() - m_position;
 }
   

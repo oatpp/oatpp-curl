@@ -37,7 +37,7 @@ public:
   
   BodyInputStream(const std::shared_ptr<CurlBodyReader>, bool nonBlocking = false);
   
-  os::io::Library::v_size read(void *data, os::io::Library::v_size count) override;
+  data::v_io_size read(void *data, data::v_io_size count) override;
   
 };
   

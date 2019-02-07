@@ -37,7 +37,7 @@ public:
   
   BodyOutputStream(const std::shared_ptr<CurlBodyWriter>, bool nonBlocking = false);
   
-  os::io::Library::v_size write(const void *data, os::io::Library::v_size count) override;
+  data::v_io_size write(const void *data, data::v_io_size count) override;
   
 };
   

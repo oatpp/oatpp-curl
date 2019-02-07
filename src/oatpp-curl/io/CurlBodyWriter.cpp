@@ -43,17 +43,17 @@ size_t CurlBodyWriter::readCallback(char *buffer, size_t size, size_t nitems, vo
   return 0;
 }
   
-os::io::Library::v_size CurlBodyWriter::write(const void *data, os::io::Library::v_size count) {
+data::v_io_size CurlBodyWriter::write(const void *data, data::v_io_size count) {
   
-  os::io::Library::v_size writeCount;
-  while ((writeCount = writeNonBlocking(data, count)) == oatpp::data::stream::Errors::ERROR_IO_RETRY) {
+  data::v_io_size writeCount;
+  while ((writeCount = writeNonBlocking(data, count)) == oatpp::data::IOError::WAIT_RETRY) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   return writeCount;
   
 }
   
-os::io::Library::v_size CurlBodyWriter::writeNonBlocking(const void *data, os::io::Library::v_size count) {
+data::v_io_size CurlBodyWriter::writeNonBlocking(const void *data, data::v_io_size count) {
   
   m_currentData = data;
   m_currentDataSize = count;
@@ -64,10 +64,10 @@ os::io::Library::v_size CurlBodyWriter::writeNonBlocking(const void *data, os::i
   if(m_currentData == nullptr) {
     return m_currentDataSize;
   } else if(still_running) {
-    return oatpp::data::stream::Errors::ERROR_IO_RETRY;
+    return oatpp::data::IOError::WAIT_RETRY;
   }
   
-  return oatpp::data::stream::Errors::ERROR_IO_PIPE;
+  return oatpp::data::IOError::BROKEN_PIPE;
   
 }
   
