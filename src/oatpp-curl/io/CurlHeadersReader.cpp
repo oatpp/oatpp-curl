@@ -29,7 +29,7 @@ namespace oatpp { namespace curl { namespace io {
 size_t CurlHeadersReader::headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
   
   oatpp::String capturedText = oatpp::String(ptr, (v_int32)(size * nmemb));
-  oatpp::parser::ParsingCaret caret(capturedText);
+  oatpp::parser::Caret caret(capturedText);
   
   CurlHeadersReader* instance = static_cast<CurlHeadersReader*>(userdata);
   
@@ -47,7 +47,7 @@ size_t CurlHeadersReader::headerCallback(char *ptr, size_t size, size_t nmemb, v
     throw std::runtime_error("[oatpp::curl::CurlHeadersReader::headerCallback(...)]: Invalid state.");
   }
   
-  return caret.getSize();
+  return caret.getDataSize();
 }
-  
+
 }}}
