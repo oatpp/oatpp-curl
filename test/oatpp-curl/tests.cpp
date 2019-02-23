@@ -31,9 +31,9 @@ public:
   Test() : oatpp::test::UnitTest("MyTag")
   {}
 
-  bool onRun() override {
+  void onRun() override {
+    // TODO write correct tests
     auto requestExecutor = oatpp::curl::RequestExecutor::createShared("url");
-    return true;
   }
 };
 
