@@ -32,7 +32,7 @@
 namespace oatpp { namespace curl { namespace io {
 
 /**
- * This class is wrapper over curl handles to provide input-stream like interface
+ * This class is wrapper over &id:oatpp::curl::io::CurlHandles; to provide input-stream like interface
  */
 class CurlBodyReader {
 private:
@@ -42,18 +42,33 @@ private:
 private:
   static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 public:
-  
-  CurlBodyReader(const std::shared_ptr<CurlHandles>& curlHandles)
-    : m_handles(curlHandles)
-    , m_position(0)
-  {
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEFUNCTION, writeCallback);
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEDATA, this);
-  }
-  
+
+  /**
+   * Constructor.
+   * @param curlHandles - &id:oatpp::curl::io::CurlHandles;.
+   */
+  CurlBodyReader(const std::shared_ptr<CurlHandles>& curlHandles);
+
+  /**
+   * Read body data.
+   * @param data - buffer to read data to.
+   * @param count - buffer size.
+   * @return - actual amount of bytes read. &id:oatpp::data::v_io_size;.
+   */
   data::v_io_size read(void *data, data::v_io_size count);
+
+  /**
+   * Non blocking attempt to Read body data.
+   * @param data - buffer to read data to.
+   * @param count - buffer size.
+   * @return - actual amount of bytes read. &id:oatpp::data::v_io_size;.
+   */
   data::v_io_size readNonBlocking(void *data, data::v_io_size count);
-  
+
+  /**
+   * Available amount of bytes currently buffered.
+   * @return - &id:oatpp::data::v_io_size;.
+   */
   data::v_io_size getAvailableBytesCount();
   
 };

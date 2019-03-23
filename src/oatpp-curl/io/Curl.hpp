@@ -30,49 +30,74 @@
 #include <curl/curl.h>
 
 namespace oatpp { namespace curl { namespace io {
-  
+
+/**
+ * Wrapper over `curl_slist`.
+ */
 class CurlHeaders {
 private:
   curl_slist* m_list;
 public:
-  
+
+  /**
+   * Constructor.
+   */
   CurlHeaders();
+
+  /**
+   * Non-virtual destructor.
+   */
   ~CurlHeaders();
-  
+
+  /**
+   * Append Header to `curl_slist`.
+   * @param key - header name. &id:oatpp::String;.
+   * @param value - header value. &id:oatpp::String;.
+   */
   void append(const oatpp::String& key, const oatpp::String& value);
-  
+
+  /**
+   * Get underlying `curl_slist`.
+   * @return - `curl_slist*`.
+   */
   curl_slist* getCurlList() {
     return m_list;
   }
   
 };
-  
+
+/**
+ * Pair of `CURL` and `CURLM`.
+ * Curl-multi is used by &id:oatpp::curl::RequestExecutor;, &id:oatpp::curl::io::CurlBodyReader;, &id:oatpp::curl::io::CurlBodyWriter;
+ * just for non-blocking perform rather then for multi-handle-perform.
+ */
 class CurlHandles {
 private:
   CURL* m_easyhandle;
   CURLM* m_multiHandle; // curl-multi is used for non-blocking perform
 public:
-  
-  CurlHandles()
-    : m_easyhandle(curl_easy_init())
-    , m_multiHandle(curl_multi_init())
-  {
-    curl_multi_add_handle(m_multiHandle, m_easyhandle);
-  }
-  
-  ~CurlHandles() {
-    curl_multi_remove_handle(m_multiHandle, m_easyhandle);
-    curl_easy_cleanup(m_easyhandle);
-    curl_multi_cleanup(m_multiHandle);
-  }
-  
-  CURL* getEasyHandle() {
-    return m_easyhandle;
-  }
-  
-  CURLM* getMultiHandle() {
-    return m_multiHandle;
-  }
+
+  /**
+   * Constructor.
+   */
+  CurlHandles();
+
+  /**
+   * Non-virtual destructor.
+   */
+  ~CurlHandles();
+
+  /**
+   * Get curl easy handle.
+   * @return - `CURL*`.
+   */
+  CURL* getEasyHandle();
+
+  /**
+   * Get curl multi handle.
+   * @return - `CURLM*`.
+   */
+  CURLM* getMultiHandle();
   
 };
   

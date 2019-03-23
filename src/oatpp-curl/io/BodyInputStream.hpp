@@ -28,15 +28,28 @@
 #include "CurlBodyReader.hpp"
 
 namespace oatpp { namespace curl { namespace io {
-  
+
+/**
+ * Wrapper over &id:oatpp::curl::io::CurlBodyReader; providing &id:oatpp::data::stream::InputStream; interface.
+ */
 class BodyInputStream : public oatpp::data::stream::InputStream {
 private:
   std::shared_ptr<CurlBodyReader> m_reader;
   bool m_nonBlocking;
 public:
-  
+
+  /**
+   * Constructor.
+   * @param nonBlocking - `true` for non-blocking reads.
+   */
   BodyInputStream(const std::shared_ptr<CurlBodyReader>, bool nonBlocking = false);
-  
+
+  /**
+   * Read data from stream. Implementation of &id:oatpp::data::stream::InputStream::read; method.
+   * @param data - buffer to read data to.
+   * @param count - buffer size.
+   * @return - &id:oatpp::data::v_io_size;.
+   */
   data::v_io_size read(void *data, data::v_io_size count) override;
   
 };

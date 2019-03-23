@@ -45,7 +45,15 @@ size_t CurlBodyReader::writeCallback(char *ptr, size_t size, size_t nmemb, void 
   }
   return instance->m_buffer.write(ptr, size * nmemb);
 }
-  
+
+CurlBodyReader::CurlBodyReader(const std::shared_ptr<CurlHandles>& curlHandles)
+  : m_handles(curlHandles)
+  , m_position(0)
+{
+  curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEFUNCTION, writeCallback);
+  curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEDATA, this);
+}
+
 data::v_io_size CurlBodyReader::read(void *data, data::v_io_size count) {
   data::v_io_size readCount;
   while ((readCount = readNonBlocking(data, count)) == oatpp::data::IOError::WAIT_RETRY) {

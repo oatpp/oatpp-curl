@@ -40,5 +40,26 @@ void CurlHeaders::append(const oatpp::String& key, const oatpp::String& value) {
   oatpp::String headerEntry = key + ": " + value;
   m_list = curl_slist_append(m_list, headerEntry->c_str());
 }
+
+CurlHandles::CurlHandles()
+  : m_easyhandle(curl_easy_init())
+  , m_multiHandle(curl_multi_init())
+{
+  curl_multi_add_handle(m_multiHandle, m_easyhandle);
+}
+
+CurlHandles::~CurlHandles() {
+  curl_multi_remove_handle(m_multiHandle, m_easyhandle);
+  curl_easy_cleanup(m_easyhandle);
+  curl_multi_cleanup(m_multiHandle);
+}
+
+CURL* CurlHandles::getEasyHandle() {
+  return m_easyhandle;
+}
+
+CURLM* CurlHandles::getMultiHandle() {
+  return m_multiHandle;
+}
   
 }}}

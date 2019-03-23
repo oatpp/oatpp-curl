@@ -34,7 +34,7 @@
 namespace oatpp { namespace curl { namespace io {
   
 /**
- * This class is wrapper over curl handles to provide output-stream like interface
+ * This class is wrapper over &id:oatpp::curl::io::CurlHandles; to provide output-stream like interface
  */
 class CurlBodyWriter {
 private:
@@ -44,17 +44,27 @@ private:
 private:
   static size_t readCallback(char *buffer, size_t size, size_t nitems, void *userdata);
 public:
-  
-  CurlBodyWriter(const std::shared_ptr<CurlHandles>& curlHandles)
-    : m_handles(curlHandles)
-    , m_currentData(nullptr)
-    , m_currentDataSize(0)
-  {
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READFUNCTION, readCallback);
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READDATA, this);
-  }
-  
+
+  /**
+   * Constructor.
+   * @param curlHandles - &id:oatpp::curl::io::CurlHandles;.
+   */
+  CurlBodyWriter(const std::shared_ptr<CurlHandles>& curlHandles);
+
+  /**
+   * Write data to body.
+   * @param data - pointer to data to write.
+   * @param count - data size.
+   * @return - actual amount of bytes written. &id:oatpp::data::v_io_size;.
+   */
   data::v_io_size write(const void *data, data::v_io_size count);
+
+  /**
+   * Non blocking attempt to write data to body.
+   * @param data - pointer to data to write.
+   * @param count - data size.
+   * @return - actual amount of bytes written. &id:oatpp::data::v_io_size;.
+   */
   data::v_io_size writeNonBlocking(const void *data, data::v_io_size count);
   
 };

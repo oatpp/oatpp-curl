@@ -42,7 +42,16 @@ size_t CurlBodyWriter::readCallback(char *buffer, size_t size, size_t nitems, vo
   
   return 0;
 }
-  
+
+CurlBodyWriter::CurlBodyWriter(const std::shared_ptr<CurlHandles>& curlHandles)
+  : m_handles(curlHandles)
+  , m_currentData(nullptr)
+  , m_currentDataSize(0)
+{
+  curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READFUNCTION, readCallback);
+  curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_READDATA, this);
+}
+
 data::v_io_size CurlBodyWriter::write(const void *data, data::v_io_size count) {
   
   data::v_io_size writeCount;
