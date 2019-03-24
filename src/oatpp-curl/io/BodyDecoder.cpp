@@ -26,7 +26,7 @@
 
 namespace oatpp { namespace curl { namespace io {
   
-void BodyDecoder::decode(const oatpp::web::protocol::http::Protocol::Headers& headers,
+void BodyDecoder::decode(const oatpp::web::protocol::http::Headers& headers,
                          const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
                          const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const
 {
@@ -36,7 +36,7 @@ void BodyDecoder::decode(const oatpp::web::protocol::http::Protocol::Headers& he
 
 oatpp::async::Action BodyDecoder::decodeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
                                               const oatpp::async::Action& actionOnReturn,
-                                              const oatpp::web::protocol::http::Protocol::Headers& headers,
+                                              const oatpp::web::protocol::http::Headers& headers,
                                               const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
                                               const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const
 {

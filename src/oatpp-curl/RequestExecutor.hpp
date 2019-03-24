@@ -30,38 +30,80 @@
 #include "oatpp/web/client/RequestExecutor.hpp"
 
 namespace oatpp { namespace curl {
-  
+
+/**
+ * Curl request executor. Uses Curl to perform client to server requests. <br>
+ * Extends &id:oatpp::web::client::RequestExecutor;.
+ */
 class RequestExecutor : public oatpp::web::client::RequestExecutor {
 private:
   oatpp::String m_baseUrl;
   std::shared_ptr<io::BodyDecoder> m_bodyDecoder;
   bool m_verbose;
 public:
-  
-  RequestExecutor(const oatpp::String& baseUrl, bool verbose = false)
-    : m_baseUrl(baseUrl)
-    , m_bodyDecoder(std::make_shared<io::BodyDecoder>())
-    , m_verbose(verbose)
-  {}
-  
+
+  /**
+   * Constructor.
+   * @param baseUrl - base url for requests. Ex.: "https://oatpp.io/"
+   * @param verbose - `true` to print curl logs to `std::cout`.
+   */
+  RequestExecutor(const oatpp::String& baseUrl, bool verbose = false);
+
+  /**
+   * Create shared RequestExecutor.
+   * @param baseUrl - base url for requests. Ex.: "https://oatpp.io/"
+   * @param verbose - `true` to print curl logs to `std::cout`.
+   * @return - `std::shared_ptr` to RequestExecutor.
+   */
   static std::shared_ptr<RequestExecutor> createShared(const oatpp::String& baseUrl, bool verbose = false) {
     return std::make_shared<RequestExecutor>(baseUrl, verbose);
   }
-  
+
+  /**
+   * Connection reuse mechanism for curl RequestExecutor is **NOT IMPLEMENTED** yet.<br>
+   * Will throw `std::runtime_error("[oatpp::curl::RequestExecutor::getConnection()]: Error. This call is not implemented yet");`
+   * @return - &id:oatpp::web::client::RequestExecutor::ConnectionHandle;.
+   */
   std::shared_ptr<ConnectionHandle> getConnection() override {
     throw std::runtime_error("[oatpp::curl::RequestExecutor::getConnection()]: Error. This call is not implemented yet");
   }
-  
+
+  /**
+   * Connection reuse mechanism for curl RequestExecutor is **NOT IMPLEMENTED** yet.<br>
+   * Will throw `std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");`
+   * @return - &id:oatpp::async::Action;.
+   */
   Action getConnectionAsync(oatpp::async::AbstractCoroutine* parentCoroutine, AsyncConnectionCallback callback) override {
     throw std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");
   }
-  
+
+  /**
+   * Execute http request. Implementation of &id:oatpp::curl::RequestExecutor::execute; method.
+   * @param method - method ex: ["GET", "POST", "PUT", etc.].
+   * @param path - path to resource.
+   * @param userDefinedHeaders - headers map &id:oatpp::web::client::RequestExecutor::Headers;.
+   * @param body - `std::shared_ptr` to &id:oatpp::web::client::RequestExecutor::Body; object.
+   * @param connectionHandle - `nullptr`.
+   * @return - &id:oatpp::web::protocol::http::incoming::Response;.
+   */
   std::shared_ptr<Response> execute(const String& method,
                                     const String& path,
                                     const Headers& userDefinedHeaders,
                                     const std::shared_ptr<Body>& body,
                                     const std::shared_ptr<ConnectionHandle>& connectionHandle = nullptr) override;
-  
+
+
+  /**
+   * Same as &l:RequestExecutor::execute (); but Async.
+   * @param parentCoroutine - caller coroutine as &id:oatpp::async::AbstractCoroutine;*.
+   * @param callback - function pointer to asynchronous callback.
+   * @param method - method ex: ["GET", "POST", "PUT", etc.].
+   * @param path - path to resource.
+   * @param headers - headers map &id:oatpp::web::client::RequestExecutor::Headers;.
+   * @param body - `std::shared_ptr` to &id:oatpp::web::client::RequestExecutor::Body; object.
+   * @param connectionHandle - `nullptr`.
+   * @return - &id:oatpp::async::Action;.
+   */
   Action executeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
                       AsyncCallback callback,
                       const String& method,

@@ -31,43 +31,67 @@
 #include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 
 namespace oatpp { namespace curl { namespace io {
-  
+
+/**
+ * Curl headers reader is responsible for reading response headers. <br>
+ * It implements `CURLOPT_HEADERFUNCTION` and stores headers in &id:oatpp::web::protocol::http::Headers;.
+ * It also captures response &id:oatpp::web::protocol::http::ResponseStartingLine;.
+ */
 class CurlHeadersReader {
 public:
+  /**
+   * STATE_INITIALIZED state of CurlHeadersReader.
+   */
   constexpr static v_int32 STATE_INITIALIZED = 0;
+
+  /**
+   * STATE_STARTED state of CurlHeadersReader.
+   */
   constexpr static v_int32 STATE_STARTED = 1;
+
+  /**
+   * STATE_FINISHED state of CurlHeadersReader.
+   */
   constexpr static v_int32 STATE_FINISHED = 2;
 private:
   std::shared_ptr<CurlHandles> m_handles;
   data::v_io_size m_position;
   v_int32 m_state;
-  oatpp::web::protocol::http::Protocol::Headers m_headers;
+  oatpp::web::protocol::http::Headers m_headers;
   oatpp::web::protocol::http::ResponseStartingLine m_startingLine;
   oatpp::data::stream::ChunkedBuffer m_buffer;
 private:
   static size_t headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 public:
-  
-  CurlHeadersReader(const std::shared_ptr<CurlHandles>& curlHandles)
-    : m_handles(curlHandles)
-    , m_position(0)
-    , m_state(STATE_INITIALIZED)
-  {
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERFUNCTION, headerCallback);
-    curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERDATA, this);
-  }
-  
-  v_int32 getState() {
-    return m_state;
-  }
-  
-  const oatpp::web::protocol::http::ResponseStartingLine& getStartingLine() const {
-    return m_startingLine;
-  }
-  
-  const oatpp::web::protocol::http::Protocol::Headers& getHeaders() const {
-    return m_headers;
-  }
+
+  /**
+   * Constructor.
+   * @param curlHandles - &id:oatpp::curl::io::CurlHandles;.
+   */
+  CurlHeadersReader(const std::shared_ptr<CurlHandles>& curlHandles);
+
+  /**
+   * State of CurlHeadersReader.
+   * @return - one of:
+   * <ul>
+   *   <li>&l:CurlHeadersReader::STATE_INITIALIZED;</li>
+   *   <li>&l:CurlHeadersReader::STATE_STARTED;</li>
+   *   <li>&l:CurlHeadersReader::STATE_FINISHED;</li>
+   * </ul>
+   */
+  v_int32 getState() const;
+
+  /**
+   * Get response starting line.
+   * @return - &id:oatpp::web::protocol::http::ResponseStartingLine;.
+   */
+  const oatpp::web::protocol::http::ResponseStartingLine& getStartingLine() const;
+
+  /**
+   * Get headers map.
+   * @return - &id:oatpp::web::protocol::http::Headers;.
+   */
+  const oatpp::web::protocol::http::Headers& getHeaders() const;
   
 };
   

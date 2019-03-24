@@ -36,18 +36,39 @@ size_t CurlHeadersReader::headerCallback(char *ptr, size_t size, size_t nmemb, v
   if(instance->m_state == STATE_INITIALIZED) {
     instance->m_state = STATE_STARTED;
     oatpp::web::protocol::http::Status error;
-    oatpp::web::protocol::http::Protocol::parseResponseStartingLine(instance->m_startingLine, capturedText.getPtr(), caret, error);
+    oatpp::web::protocol::http::Parser::parseResponseStartingLine(instance->m_startingLine, capturedText.getPtr(), caret, error);
   } else if(instance->m_state == STATE_STARTED) {
     if(caret.isAtRN()) {
       instance->m_state = STATE_FINISHED;
     }
     oatpp::web::protocol::http::Status error;
-    oatpp::web::protocol::http::Protocol::parseOneHeader(instance->m_headers, capturedText.getPtr(), caret, error);
+    oatpp::web::protocol::http::Parser::parseOneHeader(instance->m_headers, capturedText.getPtr(), caret, error);
   } else if(instance->m_state == STATE_FINISHED) {
     throw std::runtime_error("[oatpp::curl::CurlHeadersReader::headerCallback(...)]: Invalid state.");
   }
   
   return caret.getDataSize();
+}
+
+CurlHeadersReader::CurlHeadersReader(const std::shared_ptr<CurlHandles>& curlHandles)
+  : m_handles(curlHandles)
+  , m_position(0)
+  , m_state(STATE_INITIALIZED)
+{
+  curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERFUNCTION, headerCallback);
+  curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_HEADERDATA, this);
+}
+
+v_int32 CurlHeadersReader::getState() const {
+  return m_state;
+}
+
+const oatpp::web::protocol::http::ResponseStartingLine& CurlHeadersReader::getStartingLine() const {
+  return m_startingLine;
+}
+
+const oatpp::web::protocol::http::Headers& CurlHeadersReader::getHeaders() const {
+  return m_headers;
 }
 
 }}}
