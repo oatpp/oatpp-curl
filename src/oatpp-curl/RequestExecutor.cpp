@@ -99,16 +99,15 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String
   return Response::createShared(line.statusCode, line.description.toString(), responseHeaders, bodyStream, m_bodyDecoder);
 }
 
-oatpp::async::Action RequestExecutor::executeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
-                                                   AsyncCallback callback,
-                                                   const String& method,
-                                                   const String& path,
-                                                   const Headers& headers,
-                                                   const std::shared_ptr<Body>& body,
-                                                   const std::shared_ptr<ConnectionHandle>& connectionHandle)
+oatpp::async::CoroutineCallForResult<const std::shared_ptr<RequestExecutor::Response>&>
+RequestExecutor::executeAsync(const String& method,
+                              const String& path,
+                              const Headers& headers,
+                              const std::shared_ptr<Body>& body,
+                              const std::shared_ptr<ConnectionHandle>& connectionHandle)
 {
 
-  class ExecutorCoroutine : public oatpp::async::CoroutineWithResult<ExecutorCoroutine, std::shared_ptr<Response>> {
+  class ExecutorCoroutine : public oatpp::async::CoroutineWithResult<ExecutorCoroutine, const std::shared_ptr<Response>&> {
   private:
     std::shared_ptr<Body> m_body;
     std::shared_ptr<const oatpp::web::protocol::http::incoming::BodyDecoder> m_bodyDecoder;
@@ -166,7 +165,7 @@ oatpp::async::Action RequestExecutor::executeAsync(oatpp::async::AbstractCorouti
 
     Action act() override {
       if(m_body) {
-        return m_body->writeToStreamAsync(this, yieldTo(&ExecutorCoroutine::doPerform), std::make_shared<io::BodyOutputStream>(m_writer, true /* non-blocking */));
+        return m_body->writeToStreamAsync(std::make_shared<io::BodyOutputStream>(m_writer, true /* non-blocking */)).next(yieldTo(&ExecutorCoroutine::doPerform));
       }
       return yieldTo(&ExecutorCoroutine::doPerform);
     }
@@ -191,7 +190,7 @@ oatpp::async::Action RequestExecutor::executeAsync(oatpp::async::AbstractCorouti
 
   };
 
-  return parentCoroutine->startCoroutineForResult<ExecutorCoroutine>(callback, m_baseUrl + path, method, headers, body, m_bodyDecoder, m_verbose);
+  return ExecutorCoroutine::callForResult(m_baseUrl + path, method, headers, body, m_bodyDecoder, m_verbose);
 
 }
   

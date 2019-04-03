@@ -73,7 +73,7 @@ public:
    * Will throw `std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");`
    * @return - &id:oatpp::async::Action;.
    */
-  Action getConnectionAsync(oatpp::async::AbstractCoroutine* parentCoroutine, AsyncConnectionCallback callback) override {
+  oatpp::async::CoroutineCallForResult<const std::shared_ptr<ConnectionHandle>&> getConnectionAsync() override {
     throw std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");
   }
 
@@ -92,25 +92,21 @@ public:
                                     const std::shared_ptr<Body>& body,
                                     const std::shared_ptr<ConnectionHandle>& connectionHandle = nullptr) override;
 
-
   /**
    * Same as &l:RequestExecutor::execute (); but Async.
-   * @param parentCoroutine - caller coroutine as &id:oatpp::async::AbstractCoroutine;*.
-   * @param callback - function pointer to asynchronous callback.
    * @param method - method ex: ["GET", "POST", "PUT", etc.].
    * @param path - path to resource.
-   * @param headers - headers map &id:oatpp::web::client::RequestExecutor::Headers;.
-   * @param body - `std::shared_ptr` to &id:oatpp::web::client::RequestExecutor::Body; object.
-   * @param connectionHandle - `nullptr`.
-   * @return - &id:oatpp::async::Action;.
+   * @param headers - headers map &l:RequestExecutor::Headers;.
+   * @param body - `std::shared_ptr` to &l:RequestExecutor::Body; object.
+   * @param connectionHandle - &l:RequestExecutor::ConnectionHandle;.
+   * @return - &id:oatpp::async::CoroutineCallForResult;.
    */
-  Action executeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
-                      AsyncCallback callback,
-                      const String& method,
-                      const String& path,
-                      const Headers& headers,
-                      const std::shared_ptr<Body>& body,
-                      const std::shared_ptr<ConnectionHandle>& connectionHandle = nullptr) override;
+  virtual oatpp::async::CoroutineCallForResult<const std::shared_ptr<Response>&>
+  executeAsync(const String& method,
+               const String& path,
+               const Headers& headers,
+               const std::shared_ptr<Body>& body,
+               const std::shared_ptr<ConnectionHandle>& connectionHandle = nullptr) override;
   
 };
   

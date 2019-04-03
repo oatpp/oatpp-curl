@@ -34,14 +34,12 @@ void BodyDecoder::decode(const oatpp::web::protocol::http::Headers& headers,
   oatpp::data::stream::transfer(bodyStream, toStream, 0, buffer.getData(), buffer.getSize());
 }
 
-oatpp::async::Action BodyDecoder::decodeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
-                                              const oatpp::async::Action& actionOnReturn,
-                                              const oatpp::web::protocol::http::Headers& headers,
-                                              const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                              const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const
+oatpp::async::Pipeline BodyDecoder::decodeAsync(const oatpp::web::protocol::http::Headers& headers,
+                                                const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
+                                                const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const
 {
   auto buffer = oatpp::data::buffer::IOBuffer::createShared();
-  return oatpp::data::stream::transferAsync(parentCoroutine, actionOnReturn, bodyStream, toStream, 0, buffer);
+  return oatpp::data::stream::transferAsync(bodyStream, toStream, 0, buffer);
 }
   
 }}}

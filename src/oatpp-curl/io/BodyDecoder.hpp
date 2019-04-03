@@ -49,19 +49,15 @@ public:
   /**
    * Just transfer everything we have in bodyStream to toStream as-is
    * Curl already did all decoding.
-   * @param parentCoroutine - caller coroutine. &id:oatpp::async::AbstractCoroutine;.
-   * @param actionOnReturn - action to perform once done. &id:oatpp::async::Action;.
-   * @param headers - &id:oatpp::web::protocol::http::Headers;.
-   * @param bodyStream - &id:oatpp::data::stream::InputStream;.
-   * @param toStream - &id:oatpp::data::stream::OutputStream;.
-   * @return - &id:oatpp::async::Action;.
+   * @param headers - Headers map. &id:oatpp::web::protocol::http::Headers;.
+   * @param bodyStream - `std::shared_ptr` to &id:oatpp::data::stream::InputStream;.
+   * @param toStream - `std::shared_ptr` to &id:oatpp::data::stream::OutputStream;.
+   * @return - &id:oatpp::async::Pipeline;.
    */
-  oatpp::async::Action decodeAsync(oatpp::async::AbstractCoroutine* parentCoroutine,
-                                   const oatpp::async::Action& actionOnReturn,
-                                   const oatpp::web::protocol::http::Headers& headers,
-                                   const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                   const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const override;
-  
+  oatpp::async::Pipeline decodeAsync(const oatpp::web::protocol::http::Headers& headers,
+                                     const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
+                                     const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const override;
+
 };
   
 }}}
