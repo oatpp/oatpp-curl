@@ -6,7 +6,7 @@
  *                (_____)(__)(__)(__)  |_|    |_|
  *
  *
- * Copyright 2018-present, Leonid Stryzhevskyi, <lganzzzo@gmail.com>
+ * Copyright 2018-present, Leonid Stryzhevskyi <lganzzzo@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ void BodyDecoder::decode(const oatpp::web::protocol::http::Headers& headers,
   oatpp::data::stream::transfer(bodyStream, toStream, 0, buffer.getData(), buffer.getSize());
 }
 
-oatpp::async::Pipeline BodyDecoder::decodeAsync(const oatpp::web::protocol::http::Headers& headers,
-                                                const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                                const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const
+oatpp::async::CoroutineStarter BodyDecoder::decodeAsync(const oatpp::web::protocol::http::Headers& headers,
+                                                        const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
+                                                        const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const
 {
   auto buffer = oatpp::data::buffer::IOBuffer::createShared();
   return oatpp::data::stream::transferAsync(bodyStream, toStream, 0, buffer);

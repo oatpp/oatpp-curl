@@ -6,7 +6,7 @@
  *                (_____)(__)(__)(__)  |_|    |_|
  *
  *
- * Copyright 2018-present, Leonid Stryzhevskyi, <lganzzzo@gmail.com>
+ * Copyright 2018-present, Leonid Stryzhevskyi <lganzzzo@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,11 +52,11 @@ public:
    * @param headers - Headers map. &id:oatpp::web::protocol::http::Headers;.
    * @param bodyStream - `std::shared_ptr` to &id:oatpp::data::stream::InputStream;.
    * @param toStream - `std::shared_ptr` to &id:oatpp::data::stream::OutputStream;.
-   * @return - &id:oatpp::async::Pipeline;.
+   * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  oatpp::async::Pipeline decodeAsync(const oatpp::web::protocol::http::Headers& headers,
-                                     const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                     const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const override;
+  oatpp::async::CoroutineStarter decodeAsync(const oatpp::web::protocol::http::Headers& headers,
+                                             const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
+                                             const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const override;
 
 };
   

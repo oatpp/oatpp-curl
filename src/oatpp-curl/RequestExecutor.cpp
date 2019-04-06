@@ -6,7 +6,7 @@
  *                (_____)(__)(__)(__)  |_|    |_|
  *
  *
- * Copyright 2018-present, Leonid Stryzhevskyi, <lganzzzo@gmail.com>
+ * Copyright 2018-present, Leonid Stryzhevskyi <lganzzzo@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String
   return Response::createShared(line.statusCode, line.description.toString(), responseHeaders, bodyStream, m_bodyDecoder);
 }
 
-oatpp::async::CoroutineCallForResult<const std::shared_ptr<RequestExecutor::Response>&>
+oatpp::async::CoroutineStarterForResult<const std::shared_ptr<RequestExecutor::Response>&>
 RequestExecutor::executeAsync(const String& method,
                               const String& path,
                               const Headers& headers,
@@ -190,7 +190,7 @@ RequestExecutor::executeAsync(const String& method,
 
   };
 
-  return ExecutorCoroutine::callForResult(m_baseUrl + path, method, headers, body, m_bodyDecoder, m_verbose);
+  return ExecutorCoroutine::startForResult(m_baseUrl + path, method, headers, body, m_bodyDecoder, m_verbose);
 
 }
   

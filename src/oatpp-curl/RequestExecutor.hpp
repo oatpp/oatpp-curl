@@ -6,7 +6,7 @@
  *                (_____)(__)(__)(__)  |_|    |_|
  *
  *
- * Copyright 2018-present, Leonid Stryzhevskyi, <lganzzzo@gmail.com>
+ * Copyright 2018-present, Leonid Stryzhevskyi <lganzzzo@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,9 +71,9 @@ public:
   /**
    * Connection reuse mechanism for curl RequestExecutor is **NOT IMPLEMENTED** yet.<br>
    * Will throw `std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");`
-   * @return - &id:oatpp::async::Action;.
+   * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineCallForResult<const std::shared_ptr<ConnectionHandle>&> getConnectionAsync() override {
+  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<ConnectionHandle>&> getConnectionAsync() override {
     throw std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");
   }
 
@@ -99,9 +99,9 @@ public:
    * @param headers - headers map &l:RequestExecutor::Headers;.
    * @param body - `std::shared_ptr` to &l:RequestExecutor::Body; object.
    * @param connectionHandle - &l:RequestExecutor::ConnectionHandle;.
-   * @return - &id:oatpp::async::CoroutineCallForResult;.
+   * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  virtual oatpp::async::CoroutineCallForResult<const std::shared_ptr<Response>&>
+  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&>
   executeAsync(const String& method,
                const String& path,
                const Headers& headers,
