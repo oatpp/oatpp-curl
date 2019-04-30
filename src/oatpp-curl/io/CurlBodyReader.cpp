@@ -24,7 +24,7 @@
 
 #include "CurlBodyReader.hpp"
 
-#include <chrono>
+#include <thread>
 
 namespace oatpp { namespace curl { namespace io {
   

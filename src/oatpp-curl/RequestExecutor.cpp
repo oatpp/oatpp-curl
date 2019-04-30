@@ -32,6 +32,7 @@
 
 #include <curl/curl.h>
 #include <chrono>
+#include <thread>
 
 namespace oatpp { namespace curl {
 
@@ -81,7 +82,7 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String
 
   if(!bodyHeaders.empty()) {
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
-    body->writeToStream(std::make_shared<io::BodyOutputStream>(writer));
+    body->writeToStream(std::make_shared<io::BodyOutputStream>(writer, oatpp::data::stream::IOMode::BLOCKING));
   }
 
   int still_running = 1;
@@ -94,7 +95,7 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String
   auto line = headersReader.getStartingLine();
   auto responseHeaders = headersReader.getHeaders();
 
-  auto bodyStream = std::make_shared<io::BodyInputStream>(reader, false);
+  auto bodyStream = std::make_shared<io::BodyInputStream>(reader, oatpp::data::stream::IOMode::BLOCKING);
 
   return Response::createShared(line.statusCode, line.description.toString(), responseHeaders, bodyStream, m_bodyDecoder);
 }
@@ -165,7 +166,8 @@ RequestExecutor::executeAsync(const String& method,
 
     Action act() override {
       if(m_body) {
-        return m_body->writeToStreamAsync(std::make_shared<io::BodyOutputStream>(m_writer, true /* non-blocking */)).next(yieldTo(&ExecutorCoroutine::doPerform));
+        return m_body->writeToStreamAsync(std::make_shared<io::BodyOutputStream>(m_writer, oatpp::data::stream::IOMode::NON_BLOCKING))
+                      .next(yieldTo(&ExecutorCoroutine::doPerform));
       }
       return yieldTo(&ExecutorCoroutine::doPerform);
     }
@@ -176,13 +178,13 @@ RequestExecutor::executeAsync(const String& method,
         int still_running = 1;
         curl_multi_perform(m_curl->getMultiHandle(), &still_running);
         if(still_running){
-          return waitRetry();
+          return waitRepeat(std::chrono::milliseconds(100));
         }
       }
 
       auto line = m_headersReader->getStartingLine();
       auto responseHeaders = m_headersReader->getHeaders();
-      auto bodyStream = std::make_shared<io::BodyInputStream>(m_reader, true /* non-blocking */);
+      auto bodyStream = std::make_shared<io::BodyInputStream>(m_reader, oatpp::data::stream::IOMode::NON_BLOCKING);
 
       return _return(Response::createShared(line.statusCode, line.description.toString(), responseHeaders, bodyStream, m_bodyDecoder));
 

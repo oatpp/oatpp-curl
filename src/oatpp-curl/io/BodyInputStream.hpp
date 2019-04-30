@@ -35,14 +35,15 @@ namespace oatpp { namespace curl { namespace io {
 class BodyInputStream : public oatpp::data::stream::InputStream {
 private:
   std::shared_ptr<CurlBodyReader> m_reader;
-  bool m_nonBlocking;
+  oatpp::data::stream::IOMode m_ioMode;
 public:
 
   /**
    * Constructor.
-   * @param nonBlocking - `true` for non-blocking reads.
+   * @param reader
+   * @param ioMode
    */
-  BodyInputStream(const std::shared_ptr<CurlBodyReader>, bool nonBlocking = false);
+  BodyInputStream(const std::shared_ptr<CurlBodyReader> reader, oatpp::data::stream::IOMode ioMode);
 
   /**
    * Read data from stream. Implementation of &id:oatpp::data::stream::InputStream::read; method.
@@ -51,6 +52,26 @@ public:
    * @return - &id:oatpp::data::v_io_size;.
    */
   data::v_io_size read(void *data, data::v_io_size count) override;
+
+  /**
+   * Implementation of InputStream must suggest async actions for I/O results.
+   * Suggested Action is used for scheduling coroutines in async::Executor.
+   * @param ioResult - result of the call to &l:InputStream::read ();.
+   * @return - &id:oatpp::async::Action;.
+   */
+  oatpp::async::Action suggestInputStreamAction(data::v_io_size ioResult) override;
+
+  /**
+   * Set stream I/O mode.
+   * @throws
+   */
+  void setInputStreamIOMode(oatpp::data::stream::IOMode ioMode) override;
+
+  /**
+   * Get stream I/O mode.
+   * @return
+   */
+  oatpp::data::stream::IOMode getInputStreamIOMode() override;
   
 };
   

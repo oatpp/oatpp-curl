@@ -35,14 +35,15 @@ namespace oatpp { namespace curl { namespace io {
 class BodyOutputStream : public oatpp::data::stream::OutputStream {
 private:
   std::shared_ptr<CurlBodyWriter> m_writer;
-  bool m_nonBlocking;
+  oatpp::data::stream::IOMode m_ioMode;
 public:
 
   /**
    * Constructor.
-   * @param nonBlocking - `true` for non-blocking writes.
+   * @param writer
+   * @param ioMode
    */
-  BodyOutputStream(const std::shared_ptr<CurlBodyWriter>, bool nonBlocking = false);
+  BodyOutputStream(const std::shared_ptr<CurlBodyWriter> writer, oatpp::data::stream::IOMode ioMode);
 
   /**
    * Write data to stream. Implementation of &id:oatpp::data::stream::OutputStream::write; method.
@@ -51,6 +52,26 @@ public:
    * @return - actual amount of bytes written. &id:oatpp::data::v_io_size;.
    */
   data::v_io_size write(const void *data, data::v_io_size count) override;
+
+  /**
+   * Implementation of OutputStream must suggest async actions for I/O results.
+   * Suggested Action is used for scheduling coroutines in async::Executor.
+   * @param ioResult - result of the call to &l:OutputStream::write ();.
+   * @return - &id:oatpp::async::Action;.
+   */
+  oatpp::async::Action suggestOutputStreamAction(data::v_io_size ioResult) override;
+
+  /**
+   * Set OutputStream I/O mode.
+   * @param ioMode
+   */
+  void setOutputStreamIOMode(oatpp::data::stream::IOMode ioMode) override;
+
+  /**
+   * Set OutputStream I/O mode.
+   * @return
+   */
+  oatpp::data::stream::IOMode getOutputStreamIOMode() override;
   
 };
   

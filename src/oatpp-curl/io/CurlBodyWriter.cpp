@@ -24,6 +24,8 @@
 
 #include "CurlBodyWriter.hpp"
 
+#include <thread>
+
 namespace oatpp { namespace curl { namespace io {
   
 size_t CurlBodyWriter::readCallback(char *buffer, size_t size, size_t nitems, void *userdata) {
