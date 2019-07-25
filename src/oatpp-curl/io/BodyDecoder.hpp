@@ -34,29 +34,33 @@ namespace oatpp { namespace curl { namespace io {
  */
 class BodyDecoder : public oatpp::web::protocol::http::incoming::BodyDecoder {
 public:
+/**
+ * Typedef for headers map. Headers map key is case-insensitive.
+ * `std::unordered_map` of &id:oatpp::data::share::StringKeyLabelCI_FAST; and &id:oatpp::data::share::StringKeyLabel;.
+ */
+  typedef std::unordered_map<oatpp::data::share::StringKeyLabelCI_FAST, oatpp::data::share::StringKeyLabel> Headers;
+public:
 
   /**
    * Just transfer everything we have in bodyStream to toStream as-is
    * Curl already did all decoding.
-   * @param headers - &id:oatpp::web::protocol::http::Headers;.
-   * @param bodyStream - &id:oatpp::data::stream::InputStream;.
-   * @param toStream - &id:oatpp::data::stream::OutputStream;.
+   * @param headers - Headers map. &id:oatpp::web::protocol::http::Headers;.
+   * @param bodyStream - pointer to &id:oatpp::data::stream::InputStream;.
+   * @param writeCallback - &id:oatpp::data::stream::WriteCallback;.
    */
-  void decode(const oatpp::web::protocol::http::Headers& headers,
-              const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-              const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const override;
+  virtual void decode(const Headers& headers, data::stream::InputStream* bodyStream, data::stream::WriteCallback* writeCallback) const override;
 
   /**
    * Just transfer everything we have in bodyStream to toStream as-is
    * Curl already did all decoding.
    * @param headers - Headers map. &id:oatpp::web::protocol::http::Headers;.
    * @param bodyStream - `std::shared_ptr` to &id:oatpp::data::stream::InputStream;.
-   * @param toStream - `std::shared_ptr` to &id:oatpp::data::stream::OutputStream;.
+   * @param writeCallback - `std::shared_ptr` to &id:oatpp::data::stream::AsyncWriteCallback;.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  oatpp::async::CoroutineStarter decodeAsync(const oatpp::web::protocol::http::Headers& headers,
-                                             const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                             const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const override;
+  virtual oatpp::async::CoroutineStarter decodeAsync(const Headers& headers,
+                                                     const std::shared_ptr<data::stream::InputStream>& bodyStream,
+                                                     const std::shared_ptr<data::stream::AsyncWriteCallback>& writeCallback) const override;
 
 };
   

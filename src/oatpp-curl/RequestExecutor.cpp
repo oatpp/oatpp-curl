@@ -82,7 +82,8 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String
 
   if(!bodyHeaders.empty()) {
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
-    body->writeToStream(std::make_shared<io::BodyOutputStream>(writer, oatpp::data::stream::IOMode::BLOCKING));
+    io::BodyOutputStream outputStream(writer, oatpp::data::stream::IOMode::BLOCKING);
+    body->writeToStream(&outputStream);
   }
 
   int still_running = 1;
