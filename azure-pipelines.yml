@@ -10,17 +10,26 @@ jobs:
     pool:
       vmImage: 'Ubuntu 16.04'
     container:
-      image: lganzzzo/ubuntu-cmake-curl:1.0
+      image: lganzzzo/ubuntu-cmake-curl:latest
     workspace:
       clean: all
     steps:
       - script: |
           mkdir build
-      - task: CMake@1
       - script: |
-          cmake -DOATPP_MODULES_LOCATION=EXTERNAL ..
+          git clone https://github.com/oatpp/oatpp
+          mkdir -p oatpp/build
+        displayName: 'Checkout - oatpp'
+        workingDirectory: build
+      - script: |
+          cmake ..
+          sudo make install
+        displayName: 'Build - oatpp'
+        workingDirectory: build/oatpp/build
+      - script: |
+          cmake ..
           make
-        displayName: 'CMake'
+        displayName: 'Build - module'
         workingDirectory: build
       - script: |
           make test ARGS="-V"
