@@ -34,11 +34,12 @@ namespace oatpp { namespace curl { namespace io {
  */
 class BodyDecoder : public oatpp::web::protocol::http::incoming::BodyDecoder {
 public:
-/**
- * Typedef for headers map. Headers map key is case-insensitive.
- * `std::unordered_map` of &id:oatpp::data::share::StringKeyLabelCI_FAST; and &id:oatpp::data::share::StringKeyLabel;.
- */
-  typedef std::unordered_map<oatpp::data::share::StringKeyLabelCI_FAST, oatpp::data::share::StringKeyLabel> Headers;
+
+  /**
+   * Typedef for headers map. Headers map key is case-insensitive.
+   * For more info see &id:oatpp::data::share::LazyStringMap;.
+   */
+  typedef oatpp::data::share::LazyStringMap<oatpp::data::share::StringKeyLabelCI_FAST> Headers;
 public:
 
   /**

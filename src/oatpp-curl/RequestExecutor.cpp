@@ -60,11 +60,9 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String
 
   headers.append("Expect", "");
 
-  if(!userDefinedHeaders.empty()) {
-    auto currHeaderIt = userDefinedHeaders.begin();
-    while (currHeaderIt != userDefinedHeaders.end()) {
-      headers.append(currHeaderIt->first.toString(), currHeaderIt->second.toString());
-      currHeaderIt++;
+  if(userDefinedHeaders.getSize() > 0) {
+    for(const auto& pair : userDefinedHeaders.getAll_Unsafe()) {
+      headers.append(pair.first.toString(), pair.second.toString());
     }
   }
 
@@ -80,7 +78,7 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String
   curl_easy_setopt(curl->getEasyHandle(), CURLOPT_CUSTOMREQUEST, method->c_str());
   curl_easy_setopt(curl->getEasyHandle(), CURLOPT_HTTPHEADER, headers.getCurlList());
 
-  if(!bodyHeaders.empty()) {
+  if(bodyHeaders.getSize() > 0) {
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
     io::BodyOutputStream outputStream(writer, oatpp::data::stream::IOMode::BLOCKING);
     body->writeToStream(&outputStream);
@@ -142,11 +140,9 @@ RequestExecutor::executeAsync(const String& method,
 
       m_curlHeaders.append("Expect", "");
 
-      if(!headers.empty()) {
-        auto currHeaderIt = headers.begin();
-        while (currHeaderIt != headers.end()) {
-          m_curlHeaders.append(currHeaderIt->first.toString(), currHeaderIt->second.toString());
-          currHeaderIt ++;
+      if(headers.getSize() > 0) {
+        for(const auto& pair : headers.getAll_Unsafe()) {
+          m_curlHeaders.append(pair.first.toString(), pair.second.toString());
         }
       }
 
