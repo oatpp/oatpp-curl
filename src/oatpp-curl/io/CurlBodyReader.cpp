@@ -56,7 +56,7 @@ CurlBodyReader::CurlBodyReader(const std::shared_ptr<CurlHandles>& curlHandles)
 
 data::v_io_size CurlBodyReader::read(void *data, data::v_io_size count) {
   data::v_io_size readCount;
-  while ((readCount = readNonBlocking(data, count)) == oatpp::data::IOError::WAIT_RETRY) {
+  while ((readCount = readNonBlocking(data, count)) == oatpp::data::IOError::WAIT_RETRY_READ) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   return readCount;
@@ -76,7 +76,7 @@ data::v_io_size CurlBodyReader::readNonBlocking(void *data, data::v_io_size coun
     if(availableBytes == 0) {
       
       if(still_running) {
-        return oatpp::data::IOError::WAIT_RETRY;
+        return oatpp::data::IOError::WAIT_RETRY_READ;
       } else {
         return oatpp::data::IOError::BROKEN_PIPE;
       }

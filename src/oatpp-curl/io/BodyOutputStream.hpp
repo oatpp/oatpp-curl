@@ -34,6 +34,8 @@ namespace oatpp { namespace curl { namespace io {
  */
 class BodyOutputStream : public oatpp::data::stream::OutputStream {
 private:
+  static oatpp::data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
+private:
   std::shared_ptr<CurlBodyWriter> m_writer;
   oatpp::data::stream::IOMode m_ioMode;
 public:
@@ -51,7 +53,7 @@ public:
    * @param count - data size.
    * @return - actual amount of bytes written. &id:oatpp::data::v_io_size;.
    */
-  data::v_io_size write(const void *data, data::v_io_size count) override;
+  data::v_io_size write(const void *data, v_buff_size count) override;
 
   /**
    * Implementation of OutputStream must suggest async actions for I/O results.
@@ -72,6 +74,12 @@ public:
    * @return
    */
   oatpp::data::stream::IOMode getOutputStreamIOMode() override;
+
+  /**
+   * Get stream context.
+   * @return - &id:oatpp::data::stream::Context;.
+   */
+  oatpp::data::stream::Context& getOutputStreamContext() override;
   
 };
   

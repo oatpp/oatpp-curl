@@ -25,13 +25,15 @@
 #include "BodyOutputStream.hpp"
 
 namespace oatpp { namespace curl { namespace io {
+
+oatpp::data::stream::DefaultInitializedContext BodyOutputStream::DEFAULT_CONTEXT(oatpp::data::stream::StreamType::STREAM_INFINITE);
   
 BodyOutputStream::BodyOutputStream(const std::shared_ptr<CurlBodyWriter> writer, oatpp::data::stream::IOMode ioMode)
   : m_writer(writer)
   , m_ioMode(ioMode)
 {}
 
-data::v_io_size BodyOutputStream::write(const void *data, data::v_io_size count) {
+data::v_io_size BodyOutputStream::write(const void *data, v_buff_size count) {
   if(m_ioMode == oatpp::data::stream::IOMode::NON_BLOCKING) {
     return m_writer->writeNonBlocking(data, count);
   } else {
@@ -46,9 +48,9 @@ oatpp::async::Action BodyOutputStream::suggestOutputStreamAction(data::v_io_size
   }
 
   switch (ioResult) {
-    case oatpp::data::IOError::WAIT_RETRY:
+    case oatpp::data::IOError::WAIT_RETRY_WRITE:
       return oatpp::async::Action::createWaitRepeatAction(oatpp::base::Environment::getMicroTickCount() + 100 * 1000);
-    case oatpp::data::IOError::RETRY:
+    case oatpp::data::IOError::RETRY_WRITE:
       return oatpp::async::Action::createActionByType(oatpp::async::Action::TYPE_REPEAT);
   }
 
@@ -64,6 +66,10 @@ void BodyOutputStream::setOutputStreamIOMode(oatpp::data::stream::IOMode ioMode)
 
 oatpp::data::stream::IOMode BodyOutputStream::getOutputStreamIOMode() {
   return m_ioMode;
+}
+
+oatpp::data::stream::Context& BodyOutputStream::getOutputStreamContext() {
+  return DEFAULT_CONTEXT;
 }
   
 }}}

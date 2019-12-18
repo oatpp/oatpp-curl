@@ -34,6 +34,8 @@ namespace oatpp { namespace curl { namespace io {
  */
 class BodyInputStream : public oatpp::data::stream::InputStream {
 private:
+  static oatpp::data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
+private:
   std::shared_ptr<CurlBodyReader> m_reader;
   oatpp::data::stream::IOMode m_ioMode;
 public:
@@ -51,7 +53,7 @@ public:
    * @param count - buffer size.
    * @return - &id:oatpp::data::v_io_size;.
    */
-  data::v_io_size read(void *data, data::v_io_size count) override;
+  data::v_io_size read(void *data, v_buff_size count) override;
 
   /**
    * Implementation of InputStream must suggest async actions for I/O results.
@@ -72,6 +74,12 @@ public:
    * @return
    */
   oatpp::data::stream::IOMode getInputStreamIOMode() override;
+
+  /**
+   * Get stream context.
+   * @return - &l:Context;.
+   */
+  oatpp::data::stream::Context& getInputStreamContext() override;
   
 };
   
