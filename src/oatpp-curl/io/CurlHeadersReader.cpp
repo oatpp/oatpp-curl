@@ -28,7 +28,7 @@ namespace oatpp { namespace curl { namespace io {
     
 size_t CurlHeadersReader::headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
   
-  oatpp::String capturedText = oatpp::String(ptr, (v_int32)(size * nmemb));
+  oatpp::String capturedText = oatpp::String(ptr, (v_buff_size)(size * nmemb));
   oatpp::parser::Caret caret(capturedText);
   
   CurlHeadersReader* instance = static_cast<CurlHeadersReader*>(userdata);

@@ -37,16 +37,37 @@
 namespace oatpp { namespace curl {
 
 RequestExecutor::RequestExecutor(const oatpp::String& baseUrl, bool verbose)
-  : m_baseUrl(baseUrl)
+  : oatpp::web::client::RequestExecutor(nullptr)
+  , m_baseUrl(baseUrl)
   , m_bodyDecoder(std::make_shared<io::BodyDecoder>())
   , m_verbose(verbose)
 {}
 
-std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String& method,
-                                                                    const String& path,
-                                                                    const Headers& userDefinedHeaders,
-                                                                    const std::shared_ptr<Body>& body,
-                                                                    const std::shared_ptr<ConnectionHandle>& connectionHandle)
+std::shared_ptr<RequestExecutor::ConnectionHandle> RequestExecutor::getConnection() {
+  return std::make_shared<StubConnectionHandle>();
+}
+
+
+oatpp::async::CoroutineStarterForResult<const std::shared_ptr<RequestExecutor::ConnectionHandle>&> RequestExecutor::getConnectionAsync() {
+
+  class ConnectionCoroutine : public oatpp::async::CoroutineWithResult<ConnectionCoroutine, const std::shared_ptr<RequestExecutor::ConnectionHandle>& > {
+  public:
+
+    Action act() override {
+      return _return(std::make_shared<StubConnectionHandle>());
+    }
+
+  };
+
+  return ConnectionCoroutine::startForResult();
+
+}
+
+std::shared_ptr<RequestExecutor::Response> RequestExecutor::executeOnce(const String& method,
+                                                                        const String& path,
+                                                                        const Headers& userDefinedHeaders,
+                                                                        const std::shared_ptr<Body>& body,
+                                                                        const std::shared_ptr<ConnectionHandle>& connectionHandle)
 {
 
   oatpp::String url = m_baseUrl + path;
@@ -100,11 +121,11 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::execute(const String
 }
 
 oatpp::async::CoroutineStarterForResult<const std::shared_ptr<RequestExecutor::Response>&>
-RequestExecutor::executeAsync(const String& method,
-                              const String& path,
-                              const Headers& headers,
-                              const std::shared_ptr<Body>& body,
-                              const std::shared_ptr<ConnectionHandle>& connectionHandle)
+RequestExecutor::executeOnceAsync(const String& method,
+                                  const String& path,
+                                  const Headers& headers,
+                                  const std::shared_ptr<Body>& body,
+                                  const std::shared_ptr<ConnectionHandle>& connectionHandle)
 {
 
   class ExecutorCoroutine : public oatpp::async::CoroutineWithResult<ExecutorCoroutine, const std::shared_ptr<Response>&> {

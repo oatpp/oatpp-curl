@@ -1,12 +1,17 @@
 # oatpp-curl [![Build Status](https://dev.azure.com/lganzzzo/lganzzzo/_apis/build/status/oatpp.oatpp-curl?branchName=master)](https://dev.azure.com/lganzzzo/lganzzzo/_build?definitionId=5&branchName=master)
 
-**oatpp-curl** is a wrapper over the libcurl. It adapts libcurl to be used as a ```RequestExecutor``` in the oatpp's ```ApiClient```.  
+**oatpp-curl** is a wrapper over the libcurl. It adapts libcurl to be used as a `RequestExecutor` in the oatpp's `ApiClient`.  
 It supports all features of oatpp ApiClient together with Synchronous and Asynchronous oatpp's APIs.
 
-More about oat++:
-- Website: [https://oatpp.io](https://oatpp.io)
-- ```ApiClient``` docs: [https://oatpp.io/docs/component/api-client](https://oatpp.io/docs/component/api-client)
-- Usage example: [oatpp-examples/ApiClient-Demo](https://github.com/oatpp/oatpp-examples/tree/master/ApiClient-Demo)
+More about Oat++:
+- [Oat++ Website](https://oatpp.io/)
+- [Api Client Documentation](https://oatpp.io/docs/component/api-client)
+- [Api Client Demo](https://github.com/oatpp/oatpp-examples/tree/master/ApiClient-Demo)
+
+**Please note:**
+*it is recommended to use native out-of-the-box `oatpp::web::client::HttpRequestExecutor`. It is better integrated 
+with oatpp and supports additional features like connection pools, retries, streaming of large data, and custom transport substitution.*  
+*oatpp-curl provided mostly for demo purposes, documentation, and rare cases where functionality of oatpp native executor is not enough.*
 
 ## Requires
 
