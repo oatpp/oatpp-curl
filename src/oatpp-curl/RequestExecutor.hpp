@@ -36,6 +36,15 @@ namespace oatpp { namespace curl {
  * Extends &id:oatpp::web::client::RequestExecutor;.
  */
 class RequestExecutor : public oatpp::web::client::RequestExecutor {
+public:
+
+  /**
+   * Connection reuse mechanism for curl RequestExecutor is **NOT IMPLEMENTED** yet.<br>
+   * Use dummy stub to mock the real connection and prevent the crash.
+   */
+  class StubConnectionHandle : public ConnectionHandle {
+  };
+
 private:
   oatpp::String m_baseUrl;
   std::shared_ptr<io::BodyDecoder> m_bodyDecoder;
@@ -61,21 +70,15 @@ public:
 
   /**
    * Connection reuse mechanism for curl RequestExecutor is **NOT IMPLEMENTED** yet.<br>
-   * Will throw `std::runtime_error("[oatpp::curl::RequestExecutor::getConnection()]: Error. This call is not implemented yet");`
-   * @return - &id:oatpp::web::client::RequestExecutor::ConnectionHandle;.
+   * @return - &l:RequestExecutor::StubConnectionHandle;.
    */
-  std::shared_ptr<ConnectionHandle> getConnection() override {
-    throw std::runtime_error("[oatpp::curl::RequestExecutor::getConnection()]: Error. This call is not implemented yet");
-  }
+  std::shared_ptr<ConnectionHandle> getConnection() override;
 
   /**
    * Connection reuse mechanism for curl RequestExecutor is **NOT IMPLEMENTED** yet.<br>
-   * Will throw `std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");`
-   * @return - &id:oatpp::async::CoroutineStarterForResult;.
+   * @return - &l:RequestExecutor::StubConnectionHandle;.
    */
-  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<ConnectionHandle>&> getConnectionAsync() override {
-    throw std::runtime_error("[oatpp::curl::RequestExecutor::getConnectionAsync(...)]: Error. This call is not implemented yet");
-  }
+  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<ConnectionHandle>&> getConnectionAsync() override;
 
   /**
    * Invalidate connection.
@@ -91,7 +94,7 @@ public:
    * @param path - path to resource.
    * @param userDefinedHeaders - headers map &id:oatpp::web::client::RequestExecutor::Headers;.
    * @param body - `std::shared_ptr` to &id:oatpp::web::client::RequestExecutor::Body; object.
-   * @param connectionHandle - `nullptr`.
+   * @param connectionHandle - `nullptr`. This parameter is ignored for now.
    * @return - &id:oatpp::web::protocol::http::incoming::Response;.
    */
   std::shared_ptr<Response> executeOnce(const String& method,
@@ -106,7 +109,7 @@ public:
    * @param path - path to resource.
    * @param headers - headers map &l:RequestExecutor::Headers;.
    * @param body - `std::shared_ptr` to &l:RequestExecutor::Body; object.
-   * @param connectionHandle - &l:RequestExecutor::ConnectionHandle;.
+   * @param connectionHandle - `nullptr`. This parameter is ignored for now.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
   virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&>
