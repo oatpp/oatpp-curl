@@ -51,17 +51,9 @@ public:
    * Write data to stream. Implementation of &id:oatpp::data::stream::OutputStream::write; method.
    * @param data - data to write.
    * @param count - data size.
-   * @return - actual amount of bytes written. &id:oatpp::data::v_io_size;.
+   * @return - actual amount of bytes written. &id:oatpp::v_io_size;.
    */
-  data::v_io_size write(const void *data, v_buff_size count) override;
-
-  /**
-   * Implementation of OutputStream must suggest async actions for I/O results.
-   * Suggested Action is used for scheduling coroutines in async::Executor.
-   * @param ioResult - result of the call to &l:OutputStream::write ();.
-   * @return - &id:oatpp::async::Action;.
-   */
-  oatpp::async::Action suggestOutputStreamAction(data::v_io_size ioResult) override;
+  v_io_size write(const void *data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set OutputStream I/O mode.

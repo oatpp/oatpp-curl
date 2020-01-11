@@ -36,7 +36,7 @@ void BodyDecoder::decode(const Headers& headers,
 
 oatpp::async::CoroutineStarter BodyDecoder::decodeAsync(const oatpp::web::protocol::http::Headers& headers,
                                                         const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                                        const std::shared_ptr<data::stream::AsyncWriteCallback>& writeCallback) const
+                                                        const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const
 {
   auto buffer = oatpp::data::buffer::IOBuffer::createShared();
   return oatpp::data::stream::transferAsync(bodyStream, writeCallback, 0, buffer);

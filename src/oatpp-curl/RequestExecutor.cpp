@@ -184,7 +184,7 @@ RequestExecutor::executeOnceAsync(const String& method,
 
     Action act() override {
       if(m_body) {
-        return m_body->writeToStreamAsync(std::make_shared<io::BodyOutputStream>(m_writer, oatpp::data::stream::IOMode::NON_BLOCKING))
+        return m_body->writeToStreamAsync(std::make_shared<io::BodyOutputStream>(m_writer, oatpp::data::stream::IOMode::ASYNCHRONOUS))
                       .next(yieldTo(&ExecutorCoroutine::doPerform));
       }
       return yieldTo(&ExecutorCoroutine::doPerform);
@@ -202,7 +202,7 @@ RequestExecutor::executeOnceAsync(const String& method,
 
       auto line = m_headersReader->getStartingLine();
       auto responseHeaders = m_headersReader->getHeaders();
-      auto bodyStream = std::make_shared<io::BodyInputStream>(m_reader, oatpp::data::stream::IOMode::NON_BLOCKING);
+      auto bodyStream = std::make_shared<io::BodyInputStream>(m_reader, oatpp::data::stream::IOMode::ASYNCHRONOUS);
 
       return _return(Response::createShared(line.statusCode, line.description.toString(), responseHeaders, bodyStream, m_bodyDecoder));
 

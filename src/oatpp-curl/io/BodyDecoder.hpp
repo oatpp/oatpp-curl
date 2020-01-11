@@ -56,12 +56,12 @@ public:
    * Curl already did all decoding.
    * @param headers - Headers map. &id:oatpp::web::protocol::http::Headers;.
    * @param bodyStream - `std::shared_ptr` to &id:oatpp::data::stream::InputStream;.
-   * @param writeCallback - `std::shared_ptr` to &id:oatpp::data::stream::AsyncWriteCallback;.
+   * @param writeCallback - `std::shared_ptr` to &id:oatpp::data::stream::WriteCallback;.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
   virtual oatpp::async::CoroutineStarter decodeAsync(const Headers& headers,
                                                      const std::shared_ptr<data::stream::InputStream>& bodyStream,
-                                                     const std::shared_ptr<data::stream::AsyncWriteCallback>& writeCallback) const override;
+                                                     const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const override;
 
 };
   

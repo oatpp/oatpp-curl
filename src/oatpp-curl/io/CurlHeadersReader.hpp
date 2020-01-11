@@ -55,7 +55,7 @@ public:
   constexpr static v_int32 STATE_FINISHED = 2;
 private:
   std::shared_ptr<CurlHandles> m_handles;
-  data::v_io_size m_position;
+  v_io_size m_position;
   v_int32 m_state;
   oatpp::web::protocol::http::Headers m_headers;
   oatpp::web::protocol::http::ResponseStartingLine m_startingLine;

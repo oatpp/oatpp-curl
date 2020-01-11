@@ -33,36 +33,18 @@ BodyOutputStream::BodyOutputStream(const std::shared_ptr<CurlBodyWriter> writer,
   , m_ioMode(ioMode)
 {}
 
-data::v_io_size BodyOutputStream::write(const void *data, v_buff_size count) {
-  if(m_ioMode == oatpp::data::stream::IOMode::NON_BLOCKING) {
+v_io_size BodyOutputStream::write(const void *data, v_buff_size count, async::Action& action) {
+  if(m_ioMode == oatpp::data::stream::IOMode::ASYNCHRONOUS) {
+    // No Action. Just return IOError::RETRY_WRITE in case no data is available.
     return m_writer->writeNonBlocking(data, count);
   } else {
     return m_writer->write(data, count);
   }
 }
 
-oatpp::async::Action BodyOutputStream::suggestOutputStreamAction(data::v_io_size ioResult) {
-
-  if(ioResult > 0) {
-    return oatpp::async::Action::createActionByType(oatpp::async::Action::TYPE_REPEAT);
-  }
-
-  switch (ioResult) {
-    case oatpp::data::IOError::WAIT_RETRY_WRITE:
-      return oatpp::async::Action::createWaitRepeatAction(oatpp::base::Environment::getMicroTickCount() + 100 * 1000);
-    case oatpp::data::IOError::RETRY_WRITE:
-      return oatpp::async::Action::createActionByType(oatpp::async::Action::TYPE_REPEAT);
-  }
-
-  throw std::runtime_error("[oatpp::curl::io::BodyOutputStream::suggestInputStreamAction()]: Error. Unable to suggest async action for I/O result.");
-
-}
-
-
 void BodyOutputStream::setOutputStreamIOMode(oatpp::data::stream::IOMode ioMode) {
   m_ioMode = ioMode;
 }
-
 
 oatpp::data::stream::IOMode BodyOutputStream::getOutputStreamIOMode() {
   return m_ioMode;

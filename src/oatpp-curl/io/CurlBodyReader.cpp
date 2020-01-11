@@ -43,7 +43,7 @@ size_t CurlBodyReader::writeCallback(char *ptr, size_t size, size_t nmemb, void 
     instance->m_buffer.clear();
     instance->m_position = 0;
   }
-  return instance->m_buffer.write(ptr, size * nmemb);
+  return instance->m_buffer.writeSimple(ptr, size * nmemb);
 }
 
 CurlBodyReader::CurlBodyReader(const std::shared_ptr<CurlHandles>& curlHandles)
@@ -54,17 +54,17 @@ CurlBodyReader::CurlBodyReader(const std::shared_ptr<CurlHandles>& curlHandles)
   curl_easy_setopt(m_handles->getEasyHandle(), CURLOPT_WRITEDATA, this);
 }
 
-data::v_io_size CurlBodyReader::read(void *data, data::v_io_size count) {
-  data::v_io_size readCount;
-  while ((readCount = readNonBlocking(data, count)) == oatpp::data::IOError::WAIT_RETRY_READ) {
+v_io_size CurlBodyReader::read(void *data, v_io_size count) {
+  v_io_size readCount;
+  while ((readCount = readNonBlocking(data, count)) == oatpp::IOError::RETRY_READ) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   return readCount;
 }
   
-data::v_io_size CurlBodyReader::readNonBlocking(void *data, data::v_io_size count) {
+v_io_size CurlBodyReader::readNonBlocking(void *data, v_io_size count) {
   
-  data::v_io_size availableBytes = getAvailableBytesCount();
+  v_io_size availableBytes = getAvailableBytesCount();
   
   if(availableBytes == 0) {
     
@@ -76,9 +76,9 @@ data::v_io_size CurlBodyReader::readNonBlocking(void *data, data::v_io_size coun
     if(availableBytes == 0) {
       
       if(still_running) {
-        return oatpp::data::IOError::WAIT_RETRY_READ;
+        return oatpp::IOError::RETRY_READ;
       } else {
-        return oatpp::data::IOError::BROKEN_PIPE;
+        return oatpp::IOError::BROKEN_PIPE;
       }
       
     }
@@ -91,7 +91,7 @@ data::v_io_size CurlBodyReader::readNonBlocking(void *data, data::v_io_size coun
   
 }
   
-data::v_io_size CurlBodyReader::getAvailableBytesCount() {
+v_io_size CurlBodyReader::getAvailableBytesCount() {
   return m_buffer.getSize() - m_position;
 }
   

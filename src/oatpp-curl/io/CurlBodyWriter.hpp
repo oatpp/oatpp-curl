@@ -40,7 +40,7 @@ class CurlBodyWriter {
 private:
   std::shared_ptr<CurlHandles> m_handles;
   const void* m_currentData;
-  data::v_io_size m_currentDataSize;
+  v_io_size m_currentDataSize;
 private:
   static size_t readCallback(char *buffer, size_t size, size_t nitems, void *userdata);
 public:
@@ -55,17 +55,17 @@ public:
    * Write data to body.
    * @param data - pointer to data to write.
    * @param count - data size.
-   * @return - actual amount of bytes written. &id:oatpp::data::v_io_size;.
+   * @return - actual amount of bytes written. &id:oatpp::v_io_size;.
    */
-  data::v_io_size write(const void *data, data::v_io_size count);
+  v_io_size write(const void *data, v_io_size count);
 
   /**
    * Non blocking attempt to write data to body.
    * @param data - pointer to data to write.
    * @param count - data size.
-   * @return - actual amount of bytes written. &id:oatpp::data::v_io_size;.
+   * @return - actual amount of bytes written. &id:oatpp::v_io_size;.
    */
-  data::v_io_size writeNonBlocking(const void *data, data::v_io_size count);
+  v_io_size writeNonBlocking(const void *data, v_io_size count);
   
 };
   

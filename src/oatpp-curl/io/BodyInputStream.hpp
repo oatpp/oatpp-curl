@@ -51,17 +51,9 @@ public:
    * Read data from stream. Implementation of &id:oatpp::data::stream::InputStream::read; method.
    * @param data - buffer to read data to.
    * @param count - buffer size.
-   * @return - &id:oatpp::data::v_io_size;.
+   * @return - &id:oatpp::v_io_size;.
    */
-  data::v_io_size read(void *data, v_buff_size count) override;
-
-  /**
-   * Implementation of InputStream must suggest async actions for I/O results.
-   * Suggested Action is used for scheduling coroutines in async::Executor.
-   * @param ioResult - result of the call to &l:InputStream::read ();.
-   * @return - &id:oatpp::async::Action;.
-   */
-  oatpp::async::Action suggestInputStreamAction(data::v_io_size ioResult) override;
+  v_io_size read(void *data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set stream I/O mode.

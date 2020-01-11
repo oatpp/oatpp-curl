@@ -33,29 +33,13 @@ BodyInputStream::BodyInputStream(const std::shared_ptr<CurlBodyReader> reader, o
   , m_ioMode(ioMode)
 {}
 
-data::v_io_size BodyInputStream::read(void *data, v_buff_size count) {
-  if(m_ioMode == oatpp::data::stream::IOMode::NON_BLOCKING) {
+v_io_size BodyInputStream::read(void *data, v_buff_size count, async::Action& action) {
+  if(m_ioMode == oatpp::data::stream::IOMode::ASYNCHRONOUS) {
+    // No Action. Just return IOError::RETRY_READ in case no data is available.
     return m_reader->readNonBlocking(data, count);
   } else {
     return m_reader->read(data, count);
   }
-}
-
-oatpp::async::Action BodyInputStream::suggestInputStreamAction(data::v_io_size ioResult) {
-
-  if(ioResult > 0) {
-    return oatpp::async::Action::createActionByType(oatpp::async::Action::TYPE_REPEAT);
-  }
-
-  switch (ioResult) {
-    case oatpp::data::IOError::WAIT_RETRY_READ:
-      return oatpp::async::Action::createWaitRepeatAction(oatpp::base::Environment::getMicroTickCount() + 100 * 1000);
-    case oatpp::data::IOError::RETRY_READ:
-      return oatpp::async::Action::createActionByType(oatpp::async::Action::TYPE_REPEAT);
-  }
-
-  throw std::runtime_error("[oatpp::curl::io::BodyInputStream::suggestInputStreamAction()]: Error. Unable to suggest async action for I/O result.");
-
 }
 
 void BodyInputStream::setInputStreamIOMode(oatpp::data::stream::IOMode ioMode) {

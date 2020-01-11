@@ -38,7 +38,7 @@ class CurlBodyReader {
 private:
   std::shared_ptr<CurlHandles> m_handles;
   oatpp::data::stream::ChunkedBuffer m_buffer;
-  data::v_io_size m_position;
+  v_io_size m_position;
 private:
   static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 public:
@@ -53,23 +53,23 @@ public:
    * Read body data.
    * @param data - buffer to read data to.
    * @param count - buffer size.
-   * @return - actual amount of bytes read. &id:oatpp::data::v_io_size;.
+   * @return - actual amount of bytes read. &id:oatpp::v_io_size;.
    */
-  data::v_io_size read(void *data, data::v_io_size count);
+  v_io_size read(void *data, v_io_size count);
 
   /**
    * Non blocking attempt to Read body data.
    * @param data - buffer to read data to.
    * @param count - buffer size.
-   * @return - actual amount of bytes read. &id:oatpp::data::v_io_size;.
+   * @return - actual amount of bytes read. &id:oatpp::v_io_size;.
    */
-  data::v_io_size readNonBlocking(void *data, data::v_io_size count);
+  v_io_size readNonBlocking(void *data, v_io_size count);
 
   /**
    * Available amount of bytes currently buffered.
-   * @return - &id:oatpp::data::v_io_size;.
+   * @return - &id:oatpp::v_io_size;.
    */
-  data::v_io_size getAvailableBytesCount();
+  v_io_size getAvailableBytesCount();
   
 };
   
