@@ -100,9 +100,13 @@ std::shared_ptr<RequestExecutor::Response> RequestExecutor::executeOnce(const St
   curl_easy_setopt(curl->getEasyHandle(), CURLOPT_HTTPHEADER, headers.getCurlList());
 
   if(bodyHeaders.getSize() > 0) {
+
     curl_easy_setopt(curl->getEasyHandle(), CURLOPT_UPLOAD, 1L);
     io::BodyOutputStream outputStream(writer, oatpp::data::stream::IOMode::BLOCKING);
-    body->writeToStream(&outputStream);
+
+    data::buffer::IOBuffer buffer;
+    data::stream::transfer(body, &outputStream, 0, buffer.getData(), buffer.getSize());
+
   }
 
   int still_running = 1;
@@ -184,8 +188,9 @@ RequestExecutor::executeOnceAsync(const String& method,
 
     Action act() override {
       if(m_body) {
-        return m_body->writeToStreamAsync(std::make_shared<io::BodyOutputStream>(m_writer, oatpp::data::stream::IOMode::ASYNCHRONOUS))
-                      .next(yieldTo(&ExecutorCoroutine::doPerform));
+        auto stream = std::make_shared<io::BodyOutputStream>(m_writer, oatpp::data::stream::IOMode::ASYNCHRONOUS);
+        return data::stream::transferAsync(m_body, stream, 0, std::make_shared<data::buffer::IOBuffer>())
+                .next(yieldTo(&ExecutorCoroutine::doPerform));
       }
       return yieldTo(&ExecutorCoroutine::doPerform);
     }
