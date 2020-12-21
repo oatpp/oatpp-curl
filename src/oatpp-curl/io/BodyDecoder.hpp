@@ -37,9 +37,9 @@ public:
 
   /**
    * Typedef for headers map. Headers map key is case-insensitive.
-   * For more info see &id:oatpp::data::share::LazyStringMap;.
+   * For more info see &id:oatpp::data::share::LazyStringMultimap;.
    */
-  typedef oatpp::data::share::LazyStringMap<oatpp::data::share::StringKeyLabelCI_FAST> Headers;
+  typedef oatpp::data::share::LazyStringMultimap<oatpp::data::share::StringKeyLabelCI_FAST> Headers;
 public:
 
   /**
