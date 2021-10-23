@@ -39,7 +39,7 @@ public:
    * Typedef for headers map. Headers map key is case-insensitive.
    * For more info see &id:oatpp::data::share::LazyStringMultimap;.
    */
-  typedef oatpp::data::share::LazyStringMultimap<oatpp::data::share::StringKeyLabelCI_FAST> Headers;
+  typedef oatpp::data::share::LazyStringMultimap<oatpp::data::share::StringKeyLabelCI> Headers;
 public:
 
   /**
@@ -48,8 +48,11 @@ public:
    * @param headers - Headers map. &id:oatpp::web::protocol::http::Headers;.
    * @param bodyStream - pointer to &id:oatpp::data::stream::InputStream;.
    * @param writeCallback - &id:oatpp::data::stream::WriteCallback;.
+   * @param connection
    */
-  virtual void decode(const Headers& headers, data::stream::InputStream* bodyStream, data::stream::WriteCallback* writeCallback) const override;
+  virtual void decode(const Headers& headers, data::stream::InputStream* bodyStream,
+                      data::stream::WriteCallback* writeCallback,
+                      data::stream::IOStream* connection) const override;
 
   /**
    * Just transfer everything we have in bodyStream to toStream as-is
@@ -57,11 +60,13 @@ public:
    * @param headers - Headers map. &id:oatpp::web::protocol::http::Headers;.
    * @param bodyStream - `std::shared_ptr` to &id:oatpp::data::stream::InputStream;.
    * @param writeCallback - `std::shared_ptr` to &id:oatpp::data::stream::WriteCallback;.
+   * @param connection
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
   virtual oatpp::async::CoroutineStarter decodeAsync(const Headers& headers,
                                                      const std::shared_ptr<data::stream::InputStream>& bodyStream,
-                                                     const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const override;
+                                                     const std::shared_ptr<data::stream::WriteCallback>& writeCallback,
+                                                     const std::shared_ptr<data::stream::IOStream>& connection) const override;
 
 };
   

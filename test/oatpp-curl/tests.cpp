@@ -3,7 +3,6 @@
 
 #include "oatpp-curl/RequestExecutor.hpp"
 
-#include "oatpp/core/concurrency/SpinLock.hpp"
 #include "oatpp/core/base/Environment.hpp"
 
 #include <iostream>

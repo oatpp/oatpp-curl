@@ -28,16 +28,20 @@ namespace oatpp { namespace curl { namespace io {
   
 void BodyDecoder::decode(const Headers& headers,
                          data::stream::InputStream* bodyStream,
-                         data::stream::WriteCallback* writeCallback) const
+                         data::stream::WriteCallback* writeCallback,
+                         data::stream::IOStream* connection) const
 {
+  (void) connection;
   oatpp::data::buffer::IOBuffer buffer;
   oatpp::data::stream::transfer(bodyStream, writeCallback, 0, buffer.getData(), buffer.getSize());
 }
 
 oatpp::async::CoroutineStarter BodyDecoder::decodeAsync(const oatpp::web::protocol::http::Headers& headers,
                                                         const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                                        const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const
+                                                        const std::shared_ptr<data::stream::WriteCallback>& writeCallback,
+                                                        const std::shared_ptr<data::stream::IOStream>& connection) const
 {
+  (void) connection;
   auto buffer = oatpp::data::buffer::IOBuffer::createShared();
   return oatpp::data::stream::transferAsync(bodyStream, writeCallback, 0, buffer);
 }
