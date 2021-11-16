@@ -37,10 +37,10 @@ size_t CurlBodyReader::writeCallback(char *ptr, size_t size, size_t nmemb, void 
   CurlBodyReader* instance = static_cast<CurlBodyReader*>(userdata);
   
   if(instance->m_position != 0) {
-    if(instance->m_position != instance->m_buffer.getSize()){
+    if(instance->m_position != instance->m_buffer.getCurrentPosition()){
       throw std::runtime_error("[oatpp::curl::CurlBodyReader::writeCallback(...)]: Invalid state.");
     }
-    instance->m_buffer.clear();
+    instance->m_buffer.setCurrentPosition(0);
     instance->m_position = 0;
   }
   return instance->m_buffer.writeSimple(ptr, size * nmemb);
@@ -84,15 +84,19 @@ v_io_size CurlBodyReader::readNonBlocking(void *data, v_io_size count) {
     }
     
   }
-  
-  auto readCount = m_buffer.readSubstring(data, m_position, count);
+
+  v_int64 readCount = count;
+  if(count + m_position > m_buffer.getCurrentPosition()) {
+    readCount = m_buffer.getCurrentPosition() - m_position;
+  }
+  std::memcpy(data, m_buffer.getData() + m_position, readCount);
   m_position += readCount;
   return readCount;
   
 }
   
 v_io_size CurlBodyReader::getAvailableBytesCount() {
-  return m_buffer.getSize() - m_position;
+  return m_buffer.getCurrentPosition() - m_position;
 }
   
 }}}

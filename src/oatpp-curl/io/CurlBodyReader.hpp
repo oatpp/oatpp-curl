@@ -27,7 +27,7 @@
 
 #include "./Curl.hpp"
 
-#include "oatpp/core/data/stream/ChunkedBuffer.hpp"
+#include "oatpp/core/data/stream/BufferStream.hpp"
 
 namespace oatpp { namespace curl { namespace io {
 
@@ -37,7 +37,7 @@ namespace oatpp { namespace curl { namespace io {
 class CurlBodyReader {
 private:
   std::shared_ptr<CurlHandles> m_handles;
-  oatpp::data::stream::ChunkedBuffer m_buffer;
+  oatpp::data::stream::BufferOutputStream m_buffer;
   v_io_size m_position;
 private:
   static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);

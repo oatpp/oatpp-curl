@@ -28,7 +28,7 @@
 #include "./Curl.hpp"
 
 #include "oatpp/web/protocol/http/Http.hpp"
-#include "oatpp/core/data/stream/ChunkedBuffer.hpp"
+#include "oatpp/core/data/stream/BufferStream.hpp"
 
 namespace oatpp { namespace curl { namespace io {
 
@@ -59,7 +59,7 @@ private:
   v_int32 m_state;
   oatpp::web::protocol::http::Headers m_headers;
   oatpp::web::protocol::http::ResponseStartingLine m_startingLine;
-  oatpp::data::stream::ChunkedBuffer m_buffer;
+  oatpp::data::stream::BufferOutputStream m_buffer;
 private:
   static size_t headerCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 public:
