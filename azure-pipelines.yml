@@ -9,11 +9,13 @@ jobs:
     continueOnError: false
     pool:
       vmImage: 'ubuntu-20.04'
-    container:
-      image: lganzzzo/ubuntu-cmake-curl:latest
     workspace:
       clean: all
     steps:
+      - script: |
+          apt-get -y install pkg-config
+          apt-get -y install libcurl4-openssl-dev
+        displayName: 'Install deps'
       - script: |
           mkdir build
       - script: |
