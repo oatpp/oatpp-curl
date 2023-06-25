@@ -24,7 +24,7 @@ jobs:
         displayName: 'Checkout - oatpp'
         workingDirectory: build
       - script: |
-          cmake ..
+          cmake -DOATPP_BUILD_TESTS=OFF ..
           sudo make install
         displayName: 'Build - oatpp'
         workingDirectory: build/oatpp/build
