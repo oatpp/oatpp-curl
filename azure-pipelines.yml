@@ -13,8 +13,8 @@ jobs:
       clean: all
     steps:
       - script: |
-          apt-get -y install pkg-config
-          apt-get -y install libcurl4-openssl-dev
+          sudo apt-get -y install pkg-config
+          sudo apt-get -y install libcurl4-openssl-dev
         displayName: 'Install deps'
       - script: |
           mkdir build
