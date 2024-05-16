@@ -25,7 +25,7 @@
 #ifndef oatpp_curl_Curl_hpp
 #define oatpp_curl_Curl_hpp
 
-#include "oatpp/core/Types.hpp"
+#include "oatpp/Types.hpp"
 
 #include <curl/curl.h>
 

@@ -27,7 +27,7 @@
 
 #include "./Curl.hpp"
 
-#include "oatpp/core/data/stream/Stream.hpp"
+#include "oatpp/data/stream/Stream.hpp"
 
 #include <memory>
 
